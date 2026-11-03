@@ -1,0 +1,14 @@
+{% macro status_badge(status) %}
+  {% set map = {
+    'running': ('bg-emerald-50 text-emerald-700 ring-emerald-600/20', 'bg-emerald-500', 'Running'),
+    'failed': ('bg-red-50 text-red-700 ring-red-600/20', 'bg-red-500', 'Failed'),
+    'building': ('bg-amber-50 text-amber-700 ring-amber-600/20', 'bg-amber-500 pulse-dot', 'Building'),
+    'queued': ('bg-sky-50 text-sky-700 ring-sky-600/20', 'bg-sky-500 pulse-dot', 'Queued'),
+    'created': ('bg-brand-surface2 text-brand-muted ring-brand-line', 'bg-brand-line2', 'Not deployed'),
+  } %}
+  {% set cls = map.get(status, map['created']) %}
+  <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset {{ cls[0] }}">
+    <span class="w-1.5 h-1.5 rounded-full {{ cls[1] }}"></span>
+    {{ cls[2] }}
+  </span>
+{% endmacro %}

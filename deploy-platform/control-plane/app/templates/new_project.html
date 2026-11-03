@@ -1,19 +1,78 @@
-{% extends 'base.html' %}{% block content %}
-<h2>New Project</h2>
-<form method="post" class="col-md-7">
-  <label class="form-label mt-3">Name</label>
-  <input class="form-control" name="name" required placeholder="my-flask-app">
-  <label class="form-label mt-3">GitHub repo URL</label>
-  <input class="form-control" name="git_url" required placeholder="https://github.com/you/repo.git">
-  <label class="form-label mt-3">Branch</label>
-  <input class="form-control" name="branch" value="main">
-  <label class="form-label mt-3">Custom domain</label>
-  <input class="form-control" name="domain" required placeholder="app.yourdomain.com">
-  <label class="form-label mt-3">Internal port (your app listens on this)</label>
-  <input class="form-control" name="internal_port" type="number" value="8000">
-  <label class="form-label mt-3">Start command</label>
-  <input class="form-control" name="start_command" value="python app.py"
-         placeholder="e.g. gunicorn app:app">
-  <button class="btn btn-success mt-4">Create project</button>
-</form>
+{% extends 'base.html' %}
+{% block title %}New project · FABS Deploy{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+  <div class="mb-8">
+    <h1 class="text-2xl font-semibold tracking-tight">New project</h1>
+    <p class="text-sm text-brand-muted mt-1">Connect a GitHub repository and configure how it should be built and served.</p>
+  </div>
+
+  <form method="post" class="space-y-6">
+
+    <!-- Basics -->
+    <div class="bg-white border border-brand-line rounded-2xl p-6 space-y-4">
+      <h2 class="text-sm font-semibold text-brand-text">Basics</h2>
+
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Project name</label>
+        <input name="name" required placeholder="my-flask-app"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Custom domain</label>
+        <input name="domain" required placeholder="app.yourdomain.com"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+        <p class="text-[11px] text-brand-muted mt-1.5">Must be a subdomain covered by your wildcard DNS record — e.g. <span class="font-mono">app.fabsdatawarehouse.com</span>.</p>
+      </div>
+    </div>
+
+    <!-- Repository -->
+    <div class="bg-white border border-brand-line rounded-2xl p-6 space-y-4">
+      <h2 class="text-sm font-semibold text-brand-text">Repository</h2>
+
+      <div>
+        <label class="block text-sm font-medium mb-1.5">GitHub repo URL</label>
+        <input name="git_url" required placeholder="https://github.com/you/repo.git"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Branch</label>
+        <input name="branch" value="main"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+      </div>
+    </div>
+
+    <!-- Runtime -->
+    <div class="bg-white border border-brand-line rounded-2xl p-6 space-y-4">
+      <h2 class="text-sm font-semibold text-brand-text">Runtime</h2>
+
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Internal port</label>
+        <input name="internal_port" type="number" value="8000"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+        <p class="text-[11px] text-brand-muted mt-1.5">The port your app listens on inside the container. Match the <span class="font-mono">--bind</span> port in your start command.</p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Start command</label>
+        <input name="start_command" value="gunicorn --bind 0.0.0.0:8000 app:app"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+        <p class="text-[11px] text-brand-muted mt-1.5">
+          Flask: <span class="font-mono">gunicorn --bind 0.0.0.0:8000 app:app</span> &middot;
+          Factory: <span class="font-mono">"gunicorn --bind 0.0.0.0:8000 'app:create_app()'"</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <a href="{{ url_for('main.dashboard') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text px-4 py-2.5">Cancel</a>
+      <button class="bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium rounded-lg px-5 py-2.5 transition shadow-sm">
+        Create project
+      </button>
+    </div>
+  </form>
+</div>
 {% endblock %}

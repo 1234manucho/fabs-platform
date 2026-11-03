@@ -20,7 +20,7 @@ def new():
             branch=request.form.get('branch', 'main').strip() or 'main',
             domain=request.form['domain'].strip().lower(),
             internal_port=int(request.form.get('internal_port', 8000)),
-            start_command=request.form.get('start_command', 'python app.py').strip(),
+            start_command=request.form.get('start_command', 'gunicorn --bind 0.0.0.0:8000 app:app').strip(),
         )
         db.session.add(project)
         db.session.commit()
@@ -36,8 +36,9 @@ def view(project_id):
     ).first_or_404()
     deployments = Deployment.query.filter_by(project_id=project.id)\
         .order_by(Deployment.created_at.desc()).all()
+    latest = deployments[0] if deployments else None
     return render_template(
-        'project.html', project=project, deployments=deployments
+        'project.html', project=project, deployments=deployments, latest=latest
     )
 
 

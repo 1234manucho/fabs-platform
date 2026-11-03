@@ -10,4 +10,10 @@ bp = Blueprint('main', __name__)
 def dashboard():
     projects = Project.query.filter_by(user_id=current_user.id)\
         .order_by(Project.created_at.desc()).all()
-    return render_template('dashboard.html', projects=projects)
+    stats = {
+        'total': len(projects),
+        'running': sum(1 for p in projects if p.status == 'running'),
+        'failed': sum(1 for p in projects if p.status == 'failed'),
+        'deployments': sum(len(p.deployments) for p in projects),
+    }
+    return render_template('dashboard.html', projects=projects, stats=stats)

@@ -1,27 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="h-full bg-brand-bg">
 <head>
-    <title>{% block title %}Deploy{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>body { padding-top: 70px; } pre { max-height: 500px; overflow: auto; }</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ED3138">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}FABS Deploy{% endblock %}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg:'#FFFFFF', surface:'#F5F6F7', surface2:'#ECEEF1', surface3:'#E3E6EA',
+              line:'#DFE3E8', line2:'#BEC5CD', text:'#121820', muted:'#59636F', muted2:'#69717A',
+              red:'#ED3138', red2:'#C9252D', red3:'#AC1B23', redSoft:'#FFF0F1',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #BEC5CD; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #59636F; }
+    .log-scroll::-webkit-scrollbar-thumb { background: #374151; }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+  </style>
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-dark bg-dark fixed-top">
-  <div class="container">
-    <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">Deploy Platform</a>
-    <div class="navbar-nav ms-auto">
-      {% if current_user.is_authenticated %}
-        <span class="navbar-text me-3">{{ current_user.email }}</span>
-        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
-      {% endif %}
+<body class="h-full font-sans text-brand-text antialiased">
+
+{% if current_user.is_authenticated %}
+  <!-- ============ APP SHELL ============ -->
+  <input type="checkbox" id="sidebar-toggle" class="hidden peer">
+  <label for="sidebar-toggle"
+         class="fixed top-4 left-4 z-50 lg:hidden w-10 h-10 rounded-lg bg-white border border-brand-line flex items-center justify-center cursor-pointer shadow-sm">
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </label>
+
+  <aside class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-brand-line flex flex-col -translate-x-full peer-checked:translate-x-0 lg:translate-x-0 transition-transform duration-200">
+    <div class="h-16 flex items-center gap-3 px-5 border-b border-brand-line">
+      <div class="w-9 h-9 rounded-lg bg-brand-red flex items-center justify-center text-white font-bold text-lg">F</div>
+      <div>
+        <div class="font-semibold text-sm leading-tight">FABS</div>
+        <div class="text-[11px] text-brand-muted leading-tight">Deploy</div>
+      </div>
+    </div>
+
+    <nav class="flex-1 p-3 space-y-1">
+      <a href="{{ url_for('main.dashboard') }}"
+         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ 'bg-brand-redSoft text-brand-red3' if request.endpoint == 'main.dashboard' else 'text-brand-muted hover:bg-brand-surface hover:text-brand-text' }} transition">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="{{ url_for('projects.new') }}"
+         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ 'bg-brand-redSoft text-brand-red3' if request.endpoint == 'projects.new' else 'text-brand-muted hover:bg-brand-surface hover:text-brand-text' }} transition">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        New project
+      </a>
+    </nav>
+
+    <div class="p-3 border-t border-brand-line">
+      <div class="px-3 py-2 text-xs text-brand-muted truncate">{{ current_user.email }}</div>
+      <a href="{{ url_for('auth.logout') }}"
+         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-brand-muted hover:bg-brand-surface hover:text-brand-text transition">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <main class="lg:pl-64 min-h-full">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+      {% with msgs = get_flashed_messages() %}
+        {% if msgs %}
+          <div class="mb-5 space-y-2">
+            {% for m in msgs %}
+              <div class="rounded-lg border border-brand-red/20 bg-brand-redSoft px-4 py-2.5 text-sm text-brand-red3">{{ m }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+{% else %}
+  <!-- ============ AUTH SHELL ============ -->
+  <div class="min-h-full flex items-center justify-center px-4 py-12 bg-brand-surface">
+    <div class="w-full max-w-md">
+      <div class="flex items-center justify-center gap-3 mb-8">
+        <div class="w-11 h-11 rounded-xl bg-brand-red flex items-center justify-center text-white font-bold text-xl">F</div>
+        <div>
+          <div class="font-semibold text-base leading-tight">FABS</div>
+          <div class="text-xs text-brand-muted leading-tight">Deploy</div>
+        </div>
+      </div>
+
+      {% with msgs = get_flashed_messages() %}
+        {% if msgs %}
+          <div class="mb-4 space-y-2">
+            {% for m in msgs %}
+              <div class="rounded-lg border border-brand-red/20 bg-brand-redSoft px-4 py-2.5 text-sm text-brand-red3">{{ m }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block auth_content %}{% endblock %}
+
+      <p class="text-center text-xs text-brand-muted mt-8">&copy; FABS Trading &middot; Data Warehouse</p>
     </div>
   </div>
-</nav>
-<div class="container">
-  {% with msgs = get_flashed_messages() %}{% for m in msgs %}
-    <div class="alert alert-info">{{ m }}</div>
-  {% endfor %}{% endwith %}
-  {% block content %}{% endblock %}
-</div>
+{% endif %}
+
+{% block scripts %}{% endblock %}
 </body>
 </html>
