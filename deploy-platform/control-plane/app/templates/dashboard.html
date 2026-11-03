@@ -1,0 +1,19 @@
+{% extends 'base.html' %}{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Your Projects</h2>
+  <a class="btn btn-primary" href="{{ url_for('projects.new') }}">+ New Project</a>
+</div>
+{% if not projects %}
+  <p class="text-muted">No projects yet. Create one to deploy from GitHub.</p>
+{% else %}
+<div class="list-group">
+  {% for p in projects %}
+    <a href="{{ url_for('projects.view', project_id=p.id) }}"
+       class="list-group-item list-group-item-action d-flex justify-content-between">
+      <span><strong>{{ p.name }}</strong> — https://{{ p.domain }}</span>
+      <span class="badge bg-{{ 'success' if p.status=='running' else 'secondary' }}">{{ p.status }}</span>
+    </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

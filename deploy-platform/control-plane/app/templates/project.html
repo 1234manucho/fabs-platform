@@ -1,0 +1,53 @@
+{% extends 'base.html' %}{% block content %}
+<h2>{{ project.name }}
+  <span class="badge bg-{{ 'success' if project.status=='running' else 'secondary' }}">{{ project.status }}</span>
+</h2>
+<p><strong>Live at:</strong> <a href="https://{{ project.domain }}" target="_blank">https://{{ project.domain }}</a></p>
+<p><strong>Repo:</strong> {{ project.git_url }} ({{ project.branch }})</p>
+<button class="btn btn-primary mb-4" id="deployBtn">Deploy</button>
+
+<h4>Deployments</h4>
+<div id="deployments">
+  {% for d in deployments %}
+    <div class="card mb-2"><div class="card-body">
+      <strong>#{{ d.id }}</strong> — {{ d.status }} — {{ d.created_at.strftime('%Y-%m-%d %H:%M') }}
+      <details class="mt-2"><summary>Logs</summary>
+        <pre class="mt-2 bg-dark text-light p-2 rounded">{{ d.logs }}</pre>
+      </details>
+    </div></div>
+  {% endfor %}
+</div>
+
+<div class="modal fade" id="logModal" tabindex="-1"><div class="modal-dialog modal-xl"><div class="modal-content">
+  <div class="modal-header"><h5>Deploy logs</h5></div>
+  <div class="modal-body"><pre id="logOutput" class="bg-dark text-light p-2 rounded" style="max-height:600px"></pre></div>
+</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const modal = new bootstrap.Modal(document.getElementById('logModal'));
+const logOut = document.getElementById('logOutput');
+
+document.getElementById('deployBtn').onclick = async () => {
+  const r = await fetch("{{ url_for('projects.deploy', project_id=project.id) }}", {method: 'POST'});
+  const data = await r.json();
+  logOut.textContent = '';
+  modal.show();
+  poll(data.deployment_id);
+};
+
+function poll(id) {
+  fetch(`/deployments/${id}/logs`).then(r => r.json()).then(data => {
+    logOut.textContent = data.logs;
+    logOut.scrollTop = logOut.scrollHeight;
+    if (['running', 'failed'].includes(data.status)) {
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      setTimeout(() => poll(id), 1500);
+    }
+  });
+}
+</script>
+{% endblock %}
+0rkl$wwW0sw$
+0

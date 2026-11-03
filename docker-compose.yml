@@ -1,0 +1,81 @@
+name: deploy-platform
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: deploy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: deploy
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  traefik:
+    image: traefik:v3.1
+    command:
+      - --api.dashboard=false
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=deploy-platform_traefik
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks: [traefik]
+    restart: unless-stopped
+
+  web:
+    build: ./control-plane
+    command: gunicorn -b 0.0.0.0:5000 -w 2 run:app
+    environment:
+      DATABASE_URL: postgresql://deploy:${POSTGRES_PASSWORD}@postgres/deploy
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY}
+      TRAEFIK_NETWORK: deploy-platform_traefik
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET}
+    depends_on: [postgres, redis]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.platform.rule=Host(`${PLATFORM_DOMAIN}`)
+      - traefik.http.routers.platform.entrypoints=websecure
+      - traefik.http.routers.platform.tls.certresolver=letsencrypt
+      - traefik.http.services.platform.loadbalancer.server.port=5000
+    networks: [traefik, internal]
+    restart: unless-stopped
+
+  worker:
+    build: ./control-plane
+    command: python worker.py
+    environment:
+      DATABASE_URL: postgresql://deploy:${POSTGRES_PASSWORD}@postgres/deploy
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY}
+      TRAEFIK_NETWORK: deploy-platform_traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on: [postgres, redis]
+    networks: [internal, traefik]
+    restart: unless-stopped
+
+networks:
+  traefik:
+    driver: bridge
+  internal:
+
+volumes:
+  pgdata:
+  letsencrypt:

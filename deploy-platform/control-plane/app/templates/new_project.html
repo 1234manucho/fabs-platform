@@ -1,0 +1,19 @@
+{% extends 'base.html' %}{% block content %}
+<h2>New Project</h2>
+<form method="post" class="col-md-7">
+  <label class="form-label mt-3">Name</label>
+  <input class="form-control" name="name" required placeholder="my-flask-app">
+  <label class="form-label mt-3">GitHub repo URL</label>
+  <input class="form-control" name="git_url" required placeholder="https://github.com/you/repo.git">
+  <label class="form-label mt-3">Branch</label>
+  <input class="form-control" name="branch" value="main">
+  <label class="form-label mt-3">Custom domain</label>
+  <input class="form-control" name="domain" required placeholder="app.yourdomain.com">
+  <label class="form-label mt-3">Internal port (your app listens on this)</label>
+  <input class="form-control" name="internal_port" type="number" value="8000">
+  <label class="form-label mt-3">Start command</label>
+  <input class="form-control" name="start_command" value="python app.py"
+         placeholder="e.g. gunicorn app:app">
+  <button class="btn btn-success mt-4">Create project</button>
+</form>
+{% endblock %}
