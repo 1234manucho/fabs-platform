@@ -1,0 +1,130 @@
+{% extends 'public/_layout.html' %}
+{% block title %}Pricing · FABS Deploy{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
+  <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Pricing</div>
+  <h1 class="text-5xl md:text-6xl font-light tracking-[-0.03em] leading-[0.95] max-w-3xl mx-auto">
+    Simple pricing. <span class="text-brand-red">No surprises.</span>
+  </h1>
+  <p class="text-lg text-brand-muted mt-6 max-w-xl mx-auto">
+    Start free. Upgrade when your project needs managed databases, environment variables, and priority support.
+  </p>
+</section>
+
+<section class="max-w-6xl mx-auto px-6 pb-16">
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div class="bg-white border border-brand-line p-8 flex flex-col">
+      <div class="text-sm font-semibold text-brand-muted mb-1">Hobby</div>
+      <div class="text-4xl font-light mb-2">$0<span class="text-base text-brand-muted">/mo</span></div>
+      <p class="text-sm text-brand-muted mb-6">For personal projects and prototypes.</p>
+      <ul class="space-y-3 text-sm mb-8 flex-1">
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Unlimited projects</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Auto-deploy from GitHub</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Free SSL certificates</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Live build and runtime logs</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Deployment history</li>
+      </ul>
+      <a href="{{ url_for('auth.register') }}" class="block text-center border border-brand-line py-2.5 text-sm font-medium hover:border-brand-text transition">Get started free</a>
+    </div>
+
+    <div class="bg-brand-text text-white p-8 relative shadow-card flex flex-col">
+      <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-red text-white text-xs font-medium px-3 py-1">Most popular</div>
+      <div class="text-sm font-semibold text-brand-red mb-1">Pro</div>
+      <div class="text-4xl font-light mb-2">$25<span class="text-base text-white/60">/mo</span></div>
+      <p class="text-sm text-white/70 mb-6">For production apps and small teams.</p>
+      <ul class="space-y-3 text-sm mb-8 flex-1">
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Everything in Hobby</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Managed PostgreSQL databases</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Environment variables</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Priority email support</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Custom domains per project</li>
+      </ul>
+      <a href="{{ url_for('auth.register') }}" class="block text-center bg-brand-red py-2.5 text-sm font-medium hover:bg-brand-red2 transition shadow-redSm">Upgrade to Pro</a>
+    </div>
+
+    <div class="bg-white border border-brand-line p-8 flex flex-col">
+      <div class="text-sm font-semibold text-brand-muted mb-1">Enterprise</div>
+      <div class="text-4xl font-light mb-2">Custom</div>
+      <p class="text-sm text-brand-muted mb-6">For large teams and compliance needs.</p>
+      <ul class="space-y-3 text-sm mb-8 flex-1">
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Everything in Pro</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Dedicated VPS</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 99.9% uptime SLA</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Named support engineer</li>
+        <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Custom onboarding</li>
+      </ul>
+      <a href="mailto:sales@fabsdatawarehouse.com" class="block text-center border border-brand-line py-2.5 text-sm font-medium hover:border-brand-text transition">Contact sales</a>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-6 py-16 border-t border-brand-line">
+  <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-10">Feature comparison</h2>
+  <div class="overflow-hidden border border-brand-line bg-white">
+    <table class="w-full text-sm">
+      <thead class="bg-brand-surface text-left">
+        <tr>
+          <th class="px-6 py-3 font-semibold text-xs uppercase tracking-wider text-brand-muted">Feature</th>
+          <th class="px-6 py-3 font-semibold text-xs uppercase tracking-wider text-brand-muted text-center">Hobby</th>
+          <th class="px-6 py-3 font-semibold text-xs uppercase tracking-wider text-brand-red text-center">Pro</th>
+          <th class="px-6 py-3 font-semibold text-xs uppercase tracking-wider text-brand-muted text-center">Enterprise</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-brand-line">
+        <tr><td class="px-6 py-3">Projects</td><td class="px-6 py-3 text-center">Unlimited</td><td class="px-6 py-3 text-center font-medium">Unlimited</td><td class="px-6 py-3 text-center">Unlimited</td></tr>
+        <tr><td class="px-6 py-3">GitHub auto-deploy</td><td class="px-6 py-3 text-center text-emerald-600">✓</td><td class="px-6 py-3 text-center text-emerald-600">✓</td><td class="px-6 py-3 text-center text-emerald-600">✓</td></tr>
+        <tr><td class="px-6 py-3">Free SSL</td><td class="px-6 py-3 text-center text-emerald-600">✓</td><td class="px-6 py-3 text-center text-emerald-600">✓</td><td class="px-6 py-3 text-center text-emerald-600">✓</td></tr>
+        <tr><td class="px-6 py-3">Managed PostgreSQL</td><td class="px-6 py-3 text-center text-brand-muted">—</td><td class="px-6 py-3 text-center text-emerald-600">✓</td><td class="px-6 py-3 text-center text-emerald-600">✓</td></tr>
+        <tr><td class="px-6 py-3">Environment variables</td><td class="px-6 py-3 text-center text-brand-muted">—</td><td class="px-6 py-3 text-center text-emerald-600">✓</td><td class="px-6 py-3 text-center text-emerald-600">✓</td></tr>
+        <tr><td class="px-6 py-3">Custom domains</td><td class="px-6 py-3 text-center text-brand-muted">1</td><td class="px-6 py-3 text-center font-medium">Unlimited</td><td class="px-6 py-3 text-center">Unlimited</td></tr>
+        <tr><td class="px-6 py-3">Priority support</td><td class="px-6 py-3 text-center text-brand-muted">—</td><td class="px-6 py-3 text-center text-emerald-600">✓</td><td class="px-6 py-3 text-center text-emerald-600">✓</td></tr>
+        <tr><td class="px-6 py-3">Dedicated infrastructure</td><td class="px-6 py-3 text-center text-brand-muted">—</td><td class="px-6 py-3 text-center text-brand-muted">—</td><td class="px-6 py-3 text-center text-emerald-600">✓</td></tr>
+        <tr><td class="px-6 py-3">99.9% uptime SLA</td><td class="px-6 py-3 text-center text-brand-muted">—</td><td class="px-6 py-3 text-center text-brand-muted">—</td><td class="px-6 py-3 text-center text-emerald-600">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="bg-brand-surface border-t border-brand-line">
+  <div class="max-w-4xl mx-auto px-6 py-16">
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-10">Frequently asked questions</h2>
+    <div class="space-y-6">
+      <div>
+        <h3 class="font-semibold mb-2">Can I switch plans later?</h3>
+        <p class="text-sm text-brand-muted leading-relaxed">Yes — you can upgrade or downgrade at any time. When you upgrade, features become available immediately. When you downgrade, your plan change takes effect at the end of the current billing cycle.</p>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-2">What happens if I go over my plan?</h3>
+        <p class="text-sm text-brand-muted leading-relaxed">We don't throttle or surprise you with overages. If your usage is growing, we'll reach out to help you find the right plan.</p>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-2">Do you offer discounts for startups or nonprofits?</h3>
+        <p class="text-sm text-brand-muted leading-relaxed">Yes. Reach out to <a href="mailto:sales@fabsdatawarehouse.com" class="text-brand-red hover:underline">sales@fabsdatawarehouse.com</a> with details about your project and we'll work with you.</p>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-2">What payment methods do you accept?</h3>
+        <p class="text-sm text-brand-muted leading-relaxed">We accept card payments via Stripe. Enterprise customers can also pay by invoice with net-30 terms.</p>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-2">Can I host on my own infrastructure?</h3>
+        <p class="text-sm text-brand-muted leading-relaxed">Yes — FABS Deploy is built to run on your own VPS. Enterprise customers get deployment support and dedicated infrastructure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-6 py-20 border-t border-brand-line">
+  <div class="bg-brand-text text-white p-12 md:p-16 text-center">
+    <h2 class="text-3xl md:text-5xl font-light tracking-tight max-w-2xl mx-auto leading-tight">
+      Start free. <span class="text-brand-red">Upgrade when you need to.</span>
+    </h2>
+    <p class="text-white/70 mt-4 max-w-xl mx-auto">Deploy your first app in under 60 seconds.</p>
+    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{{ url_for('auth.register') }}" class="sharp-corner bg-brand-red text-white font-medium px-8 py-4 hover:bg-brand-red2 transition shadow-red">Create free account</a>
+      <a href="mailto:sales@fabsdatawarehouse.com" class="sharp-corner border border-white/20 text-white font-medium px-8 py-4 hover:border-white transition">Talk to sales</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

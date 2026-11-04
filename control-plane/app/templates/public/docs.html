@@ -1,0 +1,189 @@
+{% extends 'public/_layout.html' %}
+{% block title %}Documentation · FABS Deploy{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-[220px_1fr] gap-12">
+
+  <aside class="hidden lg:block">
+    <div class="sticky top-24 space-y-6">
+      <div>
+        <div class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-2">Getting Started</div>
+        <ul class="space-y-1 text-sm">
+          <li><a href="#quick-start" class="block px-3 py-1.5 text-brand-muted hover:text-brand-text hover:bg-brand-surface rounded transition">Quick start</a></li>
+          <li><a href="#deploy" class="block px-3 py-1.5 text-brand-muted hover:text-brand-text hover:bg-brand-surface rounded transition">Deploy from GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-2">Guides</div>
+        <ul class="space-y-1 text-sm">
+          <li><a href="#databases" class="block px-3 py-1.5 text-brand-muted hover:text-brand-text hover:bg-brand-surface rounded transition">Databases</a></li>
+          <li><a href="#env-vars" class="block px-3 py-1.5 text-brand-muted hover:text-brand-text hover:bg-brand-surface rounded transition">Environment variables</a></li>
+          <li><a href="#domains" class="block px-3 py-1.5 text-brand-muted hover:text-brand-text hover:bg-brand-surface rounded transition">Custom domains</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-2">Reference</div>
+        <ul class="space-y-1 text-sm">
+          <li><a href="#stack" class="block px-3 py-1.5 text-brand-muted hover:text-brand-text hover:bg-brand-surface rounded transition">Supported stacks</a></li>
+          <li><a href="#faq" class="block px-3 py-1.5 text-brand-muted hover:text-brand-text hover:bg-brand-surface rounded transition">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+  <div class="min-w-0">
+    <div class="mb-12">
+      <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Documentation</div>
+      <h1 class="text-4xl md:text-5xl font-light tracking-tight">Getting started</h1>
+      <p class="text-lg text-brand-muted mt-4">Deploy your first application in under 60 seconds.</p>
+    </div>
+
+    <section id="quick-start" class="mb-16">
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">Quick start</h2>
+      <p class="text-brand-muted leading-relaxed mb-4">Three steps from zero to a live app.</p>
+
+      <div class="space-y-4">
+        <div class="bg-white border border-brand-line p-6">
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 bg-brand-red text-white flex items-center justify-center text-sm font-bold shrink-0">1</div>
+            <div>
+              <h3 class="font-semibold mb-1">Create a free account</h3>
+              <p class="text-sm text-brand-muted">Sign up at <a href="{{ url_for('auth.register') }}" class="text-brand-red hover:underline">{{ url_for('auth.register') }}</a>. The first account becomes the admin.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-brand-line p-6">
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 bg-brand-red text-white flex items-center justify-center text-sm font-bold shrink-0">2</div>
+            <div>
+              <h3 class="font-semibold mb-1">Connect a GitHub repository</h3>
+              <p class="text-sm text-brand-muted">From your dashboard, click "New project" and paste your repo URL. We'll auto-detect the stack from <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">requirements.txt</code> or <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">package.json</code>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-brand-line p-6">
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 bg-brand-red text-white flex items-center justify-center text-sm font-bold shrink-0">3</div>
+            <div>
+              <h3 class="font-semibold mb-1">Click deploy</h3>
+              <p class="text-sm text-brand-muted">Your app builds and goes live on your chosen domain with automatic SSL in ~60 seconds.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="deploy" class="mb-16">
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">Deploy from GitHub</h2>
+      <p class="text-brand-muted leading-relaxed mb-4">
+        FABS Deploy clones your repo, detects the stack, builds a Docker image, and runs the container. Every push to your branch auto-deploys.
+      </p>
+
+      <h3 class="font-semibold mt-6 mb-2">Required files</h3>
+      <p class="text-sm text-brand-muted mb-3">For Python apps, include a <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">requirements.txt</code> with at minimum:</p>
+      <pre class="bg-brand-text text-gray-300 p-4 font-mono text-sm overflow-x-auto">flask
+gunicorn
+psycopg[binary]</pre>
+
+      <p class="text-sm text-brand-muted mt-4 mb-3">For Node apps, include <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">package.json</code> with a start script. Or provide your own <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">Dockerfile</code> in the repo root.</p>
+
+      <h3 class="font-semibold mt-6 mb-2">Start command</h3>
+      <p class="text-sm text-brand-muted mb-3">For Flask apps, use gunicorn bound to the internal port:</p>
+      <pre class="bg-brand-text text-gray-300 p-4 font-mono text-sm overflow-x-auto">gunicorn --bind 0.0.0.0:8000 app:app</pre>
+      <p class="text-sm text-brand-muted mt-3">If your Flask object is named differently, adjust: <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">main:app</code> or <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">"app:create_app()"</code> for factory functions.</p>
+    </section>
+
+    <section id="databases" class="mb-16">
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">Databases</h2>
+      <p class="text-brand-muted leading-relaxed mb-4">
+        From your project page, click "Create PostgreSQL" in the Databases section. FABS provisions a Postgres 16 container, generates a secure password, and auto-injects the connection string.
+      </p>
+
+      <h3 class="font-semibold mt-6 mb-2">Connection string</h3>
+      <p class="text-sm text-brand-muted mb-3">The database is exposed to your app as an environment variable:</p>
+      <pre class="bg-brand-text text-gray-300 p-4 font-mono text-sm overflow-x-auto">DATABASE_URL=postgresql://user_1:password@db-1:5432/db_1</pre>
+
+      <p class="text-sm text-brand-muted mt-4">Access it in Python:</p>
+      <pre class="bg-brand-text text-gray-300 p-4 font-mono text-sm mt-2 overflow-x-auto">import os
+db_url = os.environ['DATABASE_URL']</pre>
+
+      <p class="text-sm text-brand-muted mt-4">The database runs on the same private Docker network as your app — no traffic leaves the host.</p>
+    </section>
+
+    <section id="env-vars" class="mb-16">
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">Environment variables</h2>
+      <p class="text-brand-muted leading-relaxed mb-4">
+        On your project page, scroll to "Environment variables." Add keys like <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">SECRET_KEY</code> or <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">STRIPE_API_KEY</code>. Values are masked by default with a Reveal button.
+      </p>
+      <p class="text-sm text-brand-muted">
+        Variables are injected at container start on every deploy. Update a value, then redeploy to apply it.
+      </p>
+    </section>
+
+    <section id="domains" class="mb-16">
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">Custom domains</h2>
+      <p class="text-brand-muted leading-relaxed mb-4">
+        Your platform uses wildcard DNS — any subdomain under your platform domain works out of the box. To use an external domain:
+      </p>
+      <ol class="list-decimal list-inside space-y-2 text-sm text-brand-muted">
+        <li>Add a <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">CNAME</code> record at your DNS provider pointing to <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">platform.fabsdatawarehouse.com</code></li>
+        <li>Wait for DNS propagation (usually 5–30 minutes)</li>
+        <li>Create or edit your project with the custom domain</li>
+        <li>SSL is provisioned automatically by Let's Encrypt</li>
+      </ol>
+    </section>
+
+    <section id="stack" class="mb-16">
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">Supported stacks</h2>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="bg-white border border-brand-line p-4">
+          <div class="text-xs font-mono text-brand-muted">Python</div>
+          <div class="font-semibold mt-1">Flask, FastAPI, Django</div>
+        </div>
+        <div class="bg-white border border-brand-line p-4">
+          <div class="text-xs font-mono text-brand-muted">Node.js</div>
+          <div class="font-semibold mt-1">Express, Next.js, Fastify</div>
+        </div>
+        <div class="bg-white border border-brand-line p-4">
+          <div class="text-xs font-mono text-brand-muted">Docker</div>
+          <div class="font-semibold mt-1">Any Dockerfile</div>
+        </div>
+        <div class="bg-white border border-brand-line p-4">
+          <div class="text-xs font-mono text-brand-muted">Data</div>
+          <div class="font-semibold mt-1">PostgreSQL 16</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="mb-16">
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">FAQ</h2>
+      <div class="space-y-5">
+        <div>
+          <h3 class="font-semibold mb-1">How do I roll back a bad deploy?</h3>
+          <p class="text-sm text-brand-muted">Currently, push a revert commit to your branch — it triggers a fresh deploy with the reverted code. Rollback-to-previous is on our roadmap.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-1">What happens if my app crashes?</h3>
+          <p class="text-sm text-brand-muted">The container is set to restart automatically with <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">unless-stopped</code>. Logs are captured per deployment.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-1">Can I deploy private GitHub repos?</h3>
+          <p class="text-sm text-brand-muted">Yes — reach out to support to get a personal access token configured for your account. Public repos work with zero setup.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-1">How do I connect to my database directly?</h3>
+          <p class="text-sm text-brand-muted">Databases run inside the private Docker network. To connect from your laptop, SSH into the VPS and run <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">docker exec -it db-1 psql -U user_1 -d db_1</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="bg-brand-surface border border-brand-line p-8 text-center">
+      <h3 class="font-semibold text-lg mb-2">Still stuck?</h3>
+      <p class="text-sm text-brand-muted mb-4">We reply within one business day.</p>
+      <a href="mailto:support@fabsdatawarehouse.com" class="inline-block bg-brand-red text-white text-sm font-medium px-5 py-2.5 hover:bg-brand-red2 transition">Email support</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

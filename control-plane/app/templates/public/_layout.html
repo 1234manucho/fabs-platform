@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-white">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ED3138">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}FABS Deploy{% endblock %}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg:'#FFFFFF', surface:'#F5F6F7', surface2:'#ECEEF1', surface3:'#E3E6EA',
+              line:'#DFE3E8', line2:'#BEC5CD', text:'#121820', muted:'#59636F', muted2:'#69717A',
+              red:'#ED3138', red2:'#C9252D', red3:'#AC1B23', redSoft:'#FFF0F1',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          boxShadow: {
+            soft: '0 4px 16px rgba(18,24,32,.06)',
+            card: '0 8px 30px rgba(18,24,32,.08)',
+            red: '0 8px 32px -10px rgba(237,49,56,.25)',
+            redSm: '0 4px 16px -6px rgba(237,49,56,.2)',
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .sharp-corner { border-radius: 0px; }
+  </style>
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="font-sans text-brand-text antialiased bg-brand-bg flex flex-col min-h-screen">
+
+  {% if preview %}
+  <div class="bg-brand-text text-white text-sm">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-between">
+      <span class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        Previewing the public site
+      </span>
+      <a href="{{ url_for('main.dashboard') }}" class="text-xs font-medium underline hover:no-underline">← Back to dashboard</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="bg-brand-text text-white text-xs">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-center gap-2">
+      <span class="w-1.5 h-1.5 rounded-full bg-brand-red"></span>
+      <span>Launch offer: Free hosting for your first 3 projects.</span>
+      <a href="{{ url_for('auth.register') }}" class="underline font-medium hover:no-underline">Get started →</a>
+    </div>
+  </div>
+
+  <header class="sticky top-0 z-30 bg-brand-bg/90 backdrop-blur border-b border-brand-line">
+    <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-10">
+        <a href="{{ url_for('main.home') }}" class="flex items-center gap-2.5">
+          <div class="w-7 h-7 bg-brand-red flex items-center justify-center text-white text-sm font-black">F</div>
+          <div class="leading-tight">
+            <div class="font-semibold text-brand-text">FABS <span class="text-brand-red">DEPLOY</span></div>
+            <div class="text-[10px] font-medium tracking-wider text-brand-muted uppercase">Data Warehouse</div>
+          </div>
+        </a>
+        <div class="hidden lg:flex items-center gap-7 text-sm font-medium text-brand-muted">
+          <a href="{{ url_for('main.home') }}#product" class="hover:text-brand-text transition">Product</a>
+          <a href="{{ url_for('main.home') }}#features" class="hover:text-brand-text transition">Features</a>
+          <a href="{{ url_for('public.pricing') }}" class="hover:text-brand-text transition">Pricing</a>
+          <a href="{{ url_for('public.docs') }}" class="hover:text-brand-text transition">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        {% if preview %}
+          <a href="{{ url_for('main.dashboard') }}" class="sharp-corner bg-brand-text text-white text-sm font-medium px-5 py-2.5 hover:bg-black transition">Dashboard →</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text transition">Sign in</a>
+          <a href="{{ url_for('auth.register') }}" class="sharp-corner bg-brand-red text-white text-sm font-medium px-5 py-2.5 hover:bg-brand-red2 transition shadow-redSm">Get Started</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="bg-white border-t border-brand-line">
+    <div class="max-w-7xl mx-auto px-6 py-16">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-10 mb-12">
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Services</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Web Services</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Private Services</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Background Workers</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">PostgreSQL</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Cron Jobs <span class="text-[10px] text-brand-muted">Soon</span></a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Features</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Zero-Downtime Deploys</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Environment Variables</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Docker Support</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Private Networking</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Autoscaling <span class="text-[10px] text-brand-muted">Soon</span></a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Developers</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="{{ url_for('public.docs') }}" class="text-brand-text hover:text-brand-red transition">Docs</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Framework Quickstarts</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Changelog</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Resources</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="{{ url_for('public.pricing') }}" class="text-brand-text hover:text-brand-red transition">Pricing</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Customers</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Migration Guide</a></li>
+            <li><a href="mailto:support@fabsdatawarehouse.com" class="text-brand-text hover:text-brand-red transition">Support</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Company</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">About FABS Trading</a></li>
+            <li><a href="mailto:sales@fabsdatawarehouse.com" class="text-brand-text hover:text-brand-red transition">Contact</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Privacy Policy</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-brand-line flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-brand-muted">
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 bg-brand-red flex items-center justify-center text-white text-[10px] font-black">F</div>
+          <span>&copy; 2026 FABS Trading · Data Warehouse</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="text-xs">All systems operational</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

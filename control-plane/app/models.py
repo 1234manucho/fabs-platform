@@ -97,3 +97,13 @@ class Database(db.Model):
     @property
     def port(self):
         return 5432
+
+
+class ApiToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    token_prefix = db.Column(db.String(20), nullable=False)
+    token_hash = db.Column(db.String(255), nullable=False, unique=True, index=True)
+    last_used_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

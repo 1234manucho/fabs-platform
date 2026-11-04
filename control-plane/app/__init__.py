@@ -21,11 +21,17 @@ def create_app():
 
     app.queue = Queue('default', connection=Redis.from_url(os.getenv('REDIS_URL')))
 
-    from app.routes import auth, main, projects, webhooks
+    # Register all blueprints
+    from app.routes import (
+        public, api, auth, main, projects, webhooks, admin,
+    )
+    app.register_blueprint(public.bp)
+    app.register_blueprint(api.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(projects.bp)
     app.register_blueprint(webhooks.bp)
+    app.register_blueprint(admin.bp)
 
     with app.app_context():
         db.create_all()

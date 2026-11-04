@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}API Tokens · FABS Deploy{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+  <div class="mb-8">
+    <div class="text-xs uppercase tracking-wider text-brand-red font-semibold">Settings</div>
+    <h1 class="text-2xl font-semibold tracking-tight mt-1">API Tokens</h1>
+    <p class="text-sm text-brand-muted mt-1">
+      Create tokens to use the FABS Deploy REST API programmatically.
+      Tokens are shown once at creation and hashed on our servers.
+    </p>
+  </div>
+
+  {% with msgs = get_flashed_messages() %}
+    {% if msgs %}
+      <div class="mb-6 space-y-2">
+        {% for m in msgs %}
+          <div class="rounded-lg border border-brand-red/20 bg-brand-redSoft px-4 py-3 text-sm font-mono break-all">{{ m }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Create form -->
+  <div class="bg-white border border-brand-line rounded-2xl p-6 mb-8">
+    <h2 class="text-sm font-semibold mb-1">Create new token</h2>
+    <p class="text-xs text-brand-muted mb-4">Give it a descriptive name so you can revoke the right one later.</p>
+    <form method="post" class="flex flex-col sm:flex-row gap-2">
+      <input name="name" required placeholder="e.g. CLI, CI/CD, Local dev"
+             class="flex-1 rounded-lg border border-brand-line px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+      <button class="bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm whitespace-nowrap">
+        Create token
+      </button>
+    </form>
+  </div>
+
+  <!-- Token list -->
+  <h2 class="text-sm font-semibold mb-2">Your tokens ({{ tokens|length }})</h2>
+
+  {% if not tokens %}
+    <div class="border border-dashed border-brand-line rounded-xl p-10 text-center bg-white">
+      <div class="w-10 h-10 rounded-xl bg-brand-surface2 flex items-center justify-center mx-auto text-brand-muted">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+        </svg>
+      </div>
+      <h3 class="text-sm font-semibold mt-3">No tokens yet</h3>
+      <p class="text-sm text-brand-muted mt-1">Create one above to start using the API.</p>
+    </div>
+  {% else %}
+    <div class="overflow-hidden rounded-xl border border-brand-line bg-white">
+      <table class="w-full text-sm">
+        <thead class="bg-brand-surface text-left text-[11px] uppercase tracking-wider text-brand-muted">
+          <tr>
+            <th class="px-4 py-3 font-medium">Name</th>
+            <th class="px-4 py-3 font-medium">Prefix</th>
+            <th class="px-4 py-3 font-medium">Last used</th>
+            <th class="px-4 py-3 font-medium">Created</th>
+            <th class="px-4 py-3 font-medium text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-brand-line">
+          {% for t in tokens %}
+            <tr class="hover:bg-brand-surface/50">
+              <td class="px-4 py-3 font-medium">{{ t.name }}</td>
+              <td class="px-4 py-3 font-mono text-xs text-brand-muted">{{ t.token_prefix }}…</td>
+              <td class="px-4 py-3 text-xs text-brand-muted">
+                {% if t.last_used_at %}
+                  {{ t.last_used_at.strftime('%b %d, %H:%M') }}
+                {% else %}
+                  <span class="text-brand-muted2">Never</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-xs text-brand-muted">{{ t.created_at.strftime('%b %d, %Y') }}</td>
+              <td class="px-4 py-3 text-right">
+                <form method="post" action="{{ url_for('main.delete_token', token_id=t.id) }}"
+                      onsubmit="return confirm('Revoke token &quot;{{ t.name }}&quot;? Any apps using it will stop working.');"
+                      class="inline">
+                  <button type="submit" class="text-xs font-medium text-red-600 hover:text-red-700">Revoke</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <!-- API usage docs -->
+  <div class="mt-8 bg-brand-surface border border-brand-line rounded-xl p-6">
+    <h3 class="text-sm font-semibold mb-1">Using the API</h3>
+    <p class="text-xs text-brand-muted mb-4">
+      Include your token as a Bearer header on every request.
+    </p>
+
+    <div class="space-y-3">
+      <div>
+        <div class="text-[11px] uppercase tracking-wider text-brand-muted font-medium mb-1.5">Verify your token</div>
+        <pre class="bg-brand-text text-gray-300 p-3 font-mono text-xs overflow-x-auto rounded">curl https://platform.fabsdatawarehouse.com/api/v1/me \
+  -H "Authorization: Bearer fabs_YOUR_TOKEN"</pre>
+      </div>
+
+      <div>
+        <div class="text-[11px] uppercase tracking-wider text-brand-muted font-medium mb-1.5">List your projects</div>
+        <pre class="bg-brand-text text-gray-300 p-3 font-mono text-xs overflow-x-auto rounded">curl https://platform.fabsdatawarehouse.com/api/v1/projects \
+  -H "Authorization: Bearer fabs_YOUR_TOKEN"</pre>
+      </div>
+
+      <div>
+        <div class="text-[11px] uppercase tracking-wider text-brand-muted font-medium mb-1.5">Trigger a deploy</div>
+        <pre class="bg-brand-text text-gray-300 p-3 font-mono text-xs overflow-x-auto rounded">curl -X POST https://platform.fabsdatawarehouse.com/api/v1/projects/1/deploy \
+  -H "Authorization: Bearer fabs_YOUR_TOKEN"</pre>
+      </div>
+    </div>
+
+    <div class="mt-4 pt-4 border-t border-brand-line">
+      <p class="text-xs text-brand-muted">
+        Full API reference: <a href="{{ url_for('public.docs') }}#api" class="text-brand-red hover:underline">/docs#api</a>
+        &middot;
+        Health check (public, no token): <code class="font-mono text-[11px] bg-white border border-brand-line px-1.5 py-0.5 rounded">GET /api/v1/health</code>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
