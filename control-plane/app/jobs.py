@@ -1,6 +1,7 @@
 import os
 import shlex
 import shutil
+import secrets
 import tempfile
 import subprocess
 from datetime import datetime
@@ -100,7 +101,6 @@ def deploy(project_id, deployment_id):
             except docker.errors.NotFound:
                 pass
 
-            # Collect env vars — DO NOT log values
             env_dict = {ev.key: ev.value for ev in project.env_vars}
             if env_dict:
                 _append(deployment_id, f'Injecting {len(env_dict)} environment variable(s)\n')
@@ -174,5 +174,112 @@ def delete_docker_resources(project_id, container_name):
                         client.images.remove(img.id, force=True)
                     except Exception:
                         pass
+    except Exception:
+        pass
+
+
+def create_database(project_id, database_id):
+    from app import create_app, db
+    from app.models import Project, Database, EnvVar
+
+    app = create_app()
+    with app.app_context():
+        project = Project.query.get(project_id)
+        database = Database.query.get(database_id)
+        if not project or not database:
+            return
+
+        try:
+            client = docker.from_env()
+            container_name = f'db-{database.id}'
+            volume_name = f'db-volume-{database.id}'
+
+            if not database.db_password:
+                database.db_password = secrets.token_urlsafe(24)
+                database.db_user = f'user_{database.id}'
+                database.db_name = f'db_{database.id}'
+                database.container_name = container_name
+                db.session.commit()
+
+            try:
+                client.volumes.get(volume_name)
+            except docker.errors.NotFound:
+                client.volumes.create(name=volume_name)
+
+            try:
+                old = client.containers.get(container_name)
+                old.stop()
+                old.remove()
+            except docker.errors.NotFound:
+                pass
+
+            client.containers.run(
+                'postgres:16-alpine',
+                detach=True,
+                name=container_name,
+                environment={
+                    'POSTGRES_USER': database.db_user,
+                    'POSTGRES_PASSWORD': database.db_password,
+                    'POSTGRES_DB': database.db_name,
+                },
+                volumes={volume_name: {'bind': '/var/lib/postgresql/data', 'mode': 'rw'}},
+                network=os.getenv('TRAEFIK_NETWORK', 'deploy-platform_traefik'),
+                restart_policy={'Name': 'unless-stopped'},
+                labels={
+                    'managed-by': 'fabs-platform',
+                    f'db-id': str(database.id),
+                    f'project-id': str(project.id),
+                },
+            )
+
+            database.status = 'running'
+            db.session.commit()
+
+            conn_str = database.internal_url
+            existing = EnvVar.query.filter_by(
+                project_id=project.id, key='DATABASE_URL'
+            ).first()
+            if existing:
+                existing.value = conn_str
+            else:
+                db.session.add(EnvVar(
+                    project_id=project.id, key='DATABASE_URL', value=conn_str
+                ))
+            db.session.commit()
+
+        except Exception as e:
+            database.status = 'failed'
+            db.session.commit()
+            print(f'[db-create] error: {e}')
+
+
+def delete_database(database_id, container_name):
+    try:
+        client = docker.from_env()
+    except Exception:
+        return
+
+    if container_name:
+        try:
+            c = client.containers.get(container_name)
+            try:
+                c.stop(timeout=15)
+            except Exception:
+                pass
+            try:
+                c.remove(force=True)
+            except Exception:
+                pass
+        except docker.errors.NotFound:
+            pass
+        except Exception:
+            pass
+
+    try:
+        volume_name = f'db-volume-{database_id}'
+        v = client.volumes.get(volume_name)
+        v.remove(force=True)
+    except docker.errors.NotFound:
+        pass
     except Exception:
         pass

@@ -47,6 +47,9 @@ class Project(db.Model):
     env_vars = db.relationship(
         'EnvVar', backref='project', lazy=True, cascade='all, delete-orphan'
     )
+    databases = db.relationship(
+        'Database', backref='project', lazy=True, cascade='all, delete-orphan'
+    )
 
 
 class Deployment(db.Model):
@@ -69,3 +72,28 @@ class EnvVar(db.Model):
     __table_args__ = (
         db.UniqueConstraint('project_id', 'key', name='uix_project_env_key'),
     )
+
+
+class Database(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    engine = db.Column(db.String(50), default='postgres', nullable=False)
+    db_name = db.Column(db.String(100), nullable=False)
+    db_user = db.Column(db.String(100), nullable=False)
+    db_password = db.Column(db.String(255), nullable=False)
+    container_name = db.Column(db.String(100))
+    status = db.Column(db.String(50), default='creating')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @property
+    def internal_url(self):
+        return f'postgresql://{self.db_user}:{self.db_password}@{self.container_name}:5432/{self.db_name}'
+
+    @property
+    def host(self):
+        return self.container_name
+
+    @property
+    def port(self):
+        return 5432

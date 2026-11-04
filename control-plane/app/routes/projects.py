@@ -4,7 +4,7 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from app import db
-from app.models import Project, Deployment, EnvVar
+from app.models import Project, Deployment, EnvVar, Database
 
 bp = Blueprint('projects', __name__)
 
@@ -125,6 +125,81 @@ def delete_env(project_id, env_id):
     db.session.commit()
     flash(f'Variable {key} deleted. Redeploy to apply.')
     return redirect(url_for('projects.view', project_id=project.id))
+
+
+@bp.route('/projects/<int:project_id>/databases', methods=['POST'])
+@login_required
+def create_db(project_id):
+    project = Project.query.filter_by(
+        id=project_id, user_id=current_user.id
+    ).first_or_404()
+
+    name = request.form.get('name', '').strip()
+    if not name:
+        flash('Database name is required.')
+        return redirect(url_for('projects.view', project_id=project.id))
+
+    database = Database(
+        project_id=project.id,
+        name=name,
+        engine='postgres',
+        db_name='pending',
+        db_user='pending',
+        db_password='',
+        status='creating',
+    )
+    db.session.add(database)
+    db.session.commit()
+
+    from app.jobs import create_database
+    current_app.queue.enqueue(
+        create_database, project.id, database.id, job_timeout=180
+    )
+
+    flash(f'Database "{name}" is being created. This takes ~10 seconds.')
+    return redirect(url_for('projects.view', project_id=project.id))
+
+
+@bp.route('/databases/<int:database_id>/delete', methods=['POST'])
+@login_required
+def delete_db(database_id):
+    from app.models import Database
+    database = Database.query.get_or_404(database_id)
+    project = Project.query.filter_by(
+        id=database.project_id, user_id=current_user.id
+    ).first_or_404()
+
+    name = database.name
+    container_name = database.container_name or f'db-{database.id}'
+    db_id = database.id
+
+    db.session.delete(database)
+    db.session.commit()
+
+    from app.jobs import delete_database
+    current_app.queue.enqueue(
+        delete_database, db_id, container_name, job_timeout=120
+    )
+
+    flash(f'Database "{name}" deleted.')
+    return redirect(url_for('projects.view', project_id=project.id))
+
+
+@bp.route('/databases/<int:database_id>/connection')
+@login_required
+def db_connection(database_id):
+    from app.models import Database
+    database = Database.query.get_or_404(database_id)
+    if database.project.user_id != current_user.id:
+        return jsonify({'error': 'forbidden'}), 403
+    return jsonify({
+        'url': database.internal_url,
+        'host': database.host,
+        'port': database.port,
+        'user': database.db_user,
+        'password': database.db_password,
+        'db_name': database.db_name,
+    })
 
 
 @bp.route('/deployments/<int:deployment_id>/logs')

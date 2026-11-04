@@ -72,6 +72,61 @@
 {% endif %}
 
 
+
+<!-- Databases -->
+<div class="bg-white border border-brand-line rounded-2xl p-6 mb-8">
+  <div class="mb-4">
+    <h2 class="text-sm font-semibold">Databases</h2>
+    <p class="text-xs text-brand-muted mt-0.5">Managed PostgreSQL. Connection string is auto-injected as <code class="font-mono">DATABASE_URL</code> on next deploy.</p>
+  </div>
+
+  {% if project.databases %}
+    <div class="mb-4 divide-y divide-brand-line border border-brand-line rounded-lg overflow-hidden">
+      {% for db in project.databases|sort(attribute='name') %}
+        <div class="px-3 py-3 bg-white">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sm font-medium">{{ db.name }}</span>
+                {% if db.status == 'running' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Running</span>
+                {% elif db.status == 'creating' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 pulse-dot"></span>Creating</span>
+                {% else %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>{{ db.status }}</span>
+                {% endif %}
+              </div>
+              <div class="text-xs text-brand-muted mt-1 font-mono">
+                <span data-conn-url="{{ db.internal_url }}">••••••••••••••••</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              {% if db.status == 'running' %}
+                <button type="button" onclick="toggleConn(this)" class="text-xs font-medium text-brand-muted hover:text-brand-text">Reveal</button>
+                <button type="button" onclick="copyConn(this)" class="text-xs font-medium text-brand-muted hover:text-brand-text">Copy</button>
+              {% endif %}
+              <form method="post" action="{{ url_for('projects.delete_db', database_id=db.id) }}"
+                    onsubmit="return confirm('Delete database {{ db.name }}? All data will be lost.');" class="inline">
+                <button type="submit" class="text-xs font-medium text-red-600 hover:text-red-700">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-xs text-brand-muted mb-4">No databases yet. Create one below.</p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('projects.create_db', project_id=project.id) }}" class="flex flex-col sm:flex-row gap-2">
+    <input name="name" required placeholder="Database name (e.g. primary, analytics)"
+           class="flex-1 rounded-lg border border-brand-line px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+    <button class="bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium rounded-lg px-4 py-2 transition shadow-sm whitespace-nowrap">
+      Create PostgreSQL
+    </button>
+  </form>
+</div>
+
 <!-- Environment variables -->
 <div class="bg-white border border-brand-line rounded-2xl p-6 mb-8">
   <div class="mb-4">
@@ -207,6 +262,25 @@ function revealValue(btn) {
     code.textContent = '••••••••';
     btn.textContent = 'Reveal';
   }
+}
+
+
+function toggleConn(btn) {
+  const span = btn.closest('.px-3').querySelector('[data-conn-url]');
+  if (span.textContent.startsWith('•')) {
+    span.textContent = span.dataset.connUrl;
+    btn.textContent = 'Hide';
+  } else {
+    span.textContent = '••••••••••••••••';
+    btn.textContent = 'Reveal';
+  }
+}
+function copyConn(btn) {
+  const span = btn.closest('.px-3').querySelector('[data-conn-url]');
+  navigator.clipboard.writeText(span.dataset.connUrl).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
 }
 
 function deployProject() {
