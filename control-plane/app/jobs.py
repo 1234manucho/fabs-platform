@@ -4,9 +4,12 @@ import shutil
 import secrets
 import tempfile
 import subprocess
+import time
 from datetime import datetime
 
 import docker
+
+from app.plans import get_plan
 
 
 def _append(deployment_id, text):
@@ -46,6 +49,26 @@ CMD {cmd_json}
 
     with open(os.path.join(repo_dir, 'Dockerfile'), 'w') as f:
         f.write(df)
+
+
+def _wait_for_tcp(container, port, timeout=45):
+    """Poll the container until it accepts TCP connections on `port`."""
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            result = container.exec_run(
+                cmd=[
+                    'python', '-c',
+                    'import socket,sys; s=socket.socket(); s.settimeout(2); '
+                    f'sys.exit(0 if s.connect_ex(("localhost", {port})) == 0 else 1)'
+                ],
+            )
+            if result.exit_code == 0:
+                return True
+        except Exception:
+            pass
+        time.sleep(1)
+    return False
 
 
 def deploy(project_id, deployment_id):
@@ -107,12 +130,24 @@ def deploy(project_id, deployment_id):
             else:
                 _append(deployment_id, 'No environment variables configured\n')
 
+            # Resource limits based on plan tier
+            plan = get_plan(project.owner.plan if project.owner else 'hobby')
+            mem_mb = plan['memory_mb']
+            cpu = plan['cpu_cores']
+            _append(deployment_id, f'Plan: {plan["name"]} — {mem_mb}MB RAM, {cpu} vCPU\n')
+
             _append(deployment_id, 'Starting new container\n')
-            client.containers.run(
+            container = client.containers.run(
                 image_tag,
                 detach=True,
                 name=container_name,
                 environment=env_dict,
+                mem_limit=f'{mem_mb}m',
+                memswap_limit=f'{mem_mb}m',
+                cpu_quota=int(cpu * 100000),
+                pids_limit=200,
+                security_opt=['no-new-privileges:true'],
+                cap_drop=['ALL'],
                 labels={
                     'traefik.enable': 'true',
                     f'traefik.http.routers.project-{project.id}.rule':
@@ -126,6 +161,14 @@ def deploy(project_id, deployment_id):
                 network=os.getenv('TRAEFIK_NETWORK', 'deploy-platform_traefik'),
                 restart_policy={'Name': 'unless-stopped'},
             )
+
+            # Wait for the app to accept connections before marking success
+            _append(deployment_id, 'Waiting for app to accept connections...\n')
+            ready = _wait_for_tcp(container, project.internal_port, timeout=45)
+            if ready:
+                _append(deployment_id, '✓ App is healthy and accepting connections.\n')
+            else:
+                _append(deployment_id, '⚠ App did not respond within 45s. Container is running but may still be initializing.\n')
 
             project.container_name = container_name
             project.status = 'running'
@@ -225,6 +268,9 @@ def create_database(project_id, database_id):
                 volumes={volume_name: {'bind': '/var/lib/postgresql/data', 'mode': 'rw'}},
                 network=os.getenv('TRAEFIK_NETWORK', 'deploy-platform_traefik'),
                 restart_policy={'Name': 'unless-stopped'},
+                mem_limit='512m',
+                memswap_limit='512m',
+                security_opt=['no-new-privileges:true'],
                 labels={
                     'managed-by': 'fabs-platform',
                     f'db-id': str(database.id),
@@ -283,3 +329,63 @@ def delete_database(database_id, container_name):
         pass
     except Exception:
         pass
+
+
+def stop_idle_hobby_containers():
+    """
+    Stop containers for Hobby users whose apps have been running
+    longer than the plan's sleep_after_minutes. Called every minute
+    by a cron job. Hobby apps sleep to save resources.
+
+    A user can wake a slept app by clicking Deploy on the project page.
+    """
+    from app import create_app, db
+    from app.models import Project
+
+    app = create_app()
+    with app.app_context():
+        try:
+            client = docker.from_env()
+        except Exception:
+            return
+
+        now = datetime.utcnow()
+        sleep_min = get_plan('hobby')['sleep_after_minutes']
+        if not sleep_min:
+            return
+
+        stopped_count = 0
+
+        for project in Project.query.filter_by(status='running').all():
+            user = project.owner
+            if not user or user.plan != 'hobby':
+                continue
+
+            container_name = project.container_name or f'project-{project.id}'
+
+            try:
+                c = client.containers.get(container_name)
+                started_str = c.attrs.get('State', {}).get('StartedAt', '')
+                if not started_str:
+                    continue
+
+                # Docker returns ISO 8601 UTC like "2026-11-04T12:34:56.789Z"
+                started_at = datetime.fromisoformat(
+                    started_str.replace('Z', '+00:00')
+                ).replace(tzinfo=None)
+
+                idle_seconds = (now - started_at).total_seconds()
+                if idle_seconds > sleep_min * 60:
+                    c.stop(timeout=10)
+                    project.status = 'slept'
+                    db.session.commit()
+                    stopped_count += 1
+                    print(f'[hobby-sleep] stopped {container_name} (idle {int(idle_seconds)}s)')
+
+            except docker.errors.NotFound:
+                pass
+            except Exception as e:
+                print(f'[hobby-sleep] error on {container_name}: {e}')
+
+        if stopped_count:
+            print(f'[hobby-sleep] total stopped: {stopped_count}')

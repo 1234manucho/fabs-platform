@@ -23,7 +23,7 @@ def create_app():
 
     # Register all blueprints
     from app.routes import (
-        public, api, auth, main, projects, webhooks, admin,
+        public, api, auth, main, projects, webhooks, admin, billing,
     )
     app.register_blueprint(public.bp)
     app.register_blueprint(api.bp)
@@ -32,6 +32,7 @@ def create_app():
     app.register_blueprint(projects.bp)
     app.register_blueprint(webhooks.bp)
     app.register_blueprint(admin.bp)
+    app.register_blueprint(billing.bp)
 
     # Register CLI commands
     from app.cli import register_cli

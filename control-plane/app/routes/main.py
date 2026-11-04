@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, render_template, redirect, url_for,
-    request, flash,
+    request, flash, session,
 )
 from flask_login import login_required, current_user
 from app import db
@@ -10,13 +10,8 @@ from app.api_auth import generate_api_token
 bp = Blueprint('main', __name__)
 
 
-# ============================================================
-# PUBLIC ROUTES
-# ============================================================
-
 @bp.route('/')
 def home():
-    """Root — homepage if logged out, dashboard redirect if logged in."""
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
     return render_template('home.html', preview=False)
@@ -24,18 +19,12 @@ def home():
 
 @bp.route('/home')
 def home_public():
-    """Always shows the public homepage, even when logged in."""
     return render_template('home.html', preview=current_user.is_authenticated)
 
-
-# ============================================================
-# AUTHENTICATED ROUTES
-# ============================================================
 
 @bp.route('/dashboard')
 @login_required
 def dashboard():
-    """User's project dashboard with aggregated stats."""
     projects = Project.query.filter_by(user_id=current_user.id)\
         .order_by(Project.created_at.desc()).all()
     stats = {
@@ -47,14 +36,9 @@ def dashboard():
     return render_template('dashboard.html', projects=projects, stats=stats)
 
 
-# ============================================================
-# API TOKEN MANAGEMENT
-# ============================================================
-
 @bp.route('/settings/tokens', methods=['GET', 'POST'])
 @login_required
 def settings_tokens():
-    """List and create API tokens for the current user."""
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         if not name:
@@ -62,25 +46,41 @@ def settings_tokens():
             return redirect(url_for('main.settings_tokens'))
 
         raw, prefix, hashed = generate_api_token()
-        db.session.add(ApiToken(
+        token = ApiToken(
             user_id=current_user.id,
             name=name,
             token_prefix=prefix,
             token_hash=hashed,
-        ))
+        )
+        db.session.add(token)
         db.session.commit()
-        flash(f'Token created — copy it now, it will not be shown again: {raw}')
-        return redirect(url_for('main.settings_tokens'))
+
+        # FIX: Store raw token in session for one-time display instead of flash
+        session[f'new_token_{token.id}'] = raw
+        return redirect(url_for('main.token_created', token_id=token.id))
 
     tokens = ApiToken.query.filter_by(user_id=current_user.id)\
         .order_by(ApiToken.created_at.desc()).all()
     return render_template('settings_tokens.html', tokens=tokens)
 
 
+@bp.route('/settings/tokens/<int:token_id>/created')
+@login_required
+def token_created(token_id):
+    """One-time token display. Raw token is popped from session — shows exactly once."""
+    token = ApiToken.query.filter_by(
+        id=token_id, user_id=current_user.id
+    ).first_or_404()
+    raw = session.pop(f'new_token_{token_id}', None)
+    if not raw:
+        flash('Token already shown. Create a new one if you need it.')
+        return redirect(url_for('main.settings_tokens'))
+    return render_template('settings_token_created.html', token=token, raw=raw)
+
+
 @bp.route('/settings/tokens/<int:token_id>/delete', methods=['POST'])
 @login_required
 def delete_token(token_id):
-    """Revoke an API token."""
     t = ApiToken.query.filter_by(
         id=token_id, user_id=current_user.id
     ).first_or_404()

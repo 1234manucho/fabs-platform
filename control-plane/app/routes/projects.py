@@ -5,6 +5,7 @@ from flask import (
 from flask_login import login_required, current_user
 from app import db
 from app.models import Project, Deployment, EnvVar, Database
+from app.payment_gate import paid_required
 
 bp = Blueprint('projects', __name__)
 
@@ -44,6 +45,7 @@ def view(project_id):
 
 @bp.route('/projects/<int:project_id>/deploy', methods=['POST'])
 @login_required
+@paid_required
 def deploy(project_id):
     project = Project.query.filter_by(
         id=project_id, user_id=current_user.id
@@ -129,6 +131,7 @@ def delete_env(project_id, env_id):
 
 @bp.route('/projects/<int:project_id>/databases', methods=['POST'])
 @login_required
+@paid_required
 def create_db(project_id):
     project = Project.query.filter_by(
         id=project_id, user_id=current_user.id
@@ -163,7 +166,6 @@ def create_db(project_id):
 @bp.route('/databases/<int:database_id>/delete', methods=['POST'])
 @login_required
 def delete_db(database_id):
-    from app.models import Database
     database = Database.query.get_or_404(database_id)
     project = Project.query.filter_by(
         id=database.project_id, user_id=current_user.id
@@ -173,6 +175,13 @@ def delete_db(database_id):
     container_name = database.container_name or f'db-{database.id}'
     db_id = database.id
 
+    # Also remove the auto-injected DATABASE_URL env var
+    env = EnvVar.query.filter_by(
+        project_id=project.id, key='DATABASE_URL'
+    ).first()
+    if env:
+        db.session.delete(env)
+
     db.session.delete(database)
     db.session.commit()
 
@@ -181,14 +190,13 @@ def delete_db(database_id):
         delete_database, db_id, container_name, job_timeout=120
     )
 
-    flash(f'Database "{name}" deleted.')
+    flash(f'Database "{name}" deleted. Redeploy to remove the DATABASE_URL variable.')
     return redirect(url_for('projects.view', project_id=project.id))
 
 
 @bp.route('/databases/<int:database_id>/connection')
 @login_required
 def db_connection(database_id):
-    from app.models import Database
     database = Database.query.get_or_404(database_id)
     if database.project.user_id != current_user.id:
         return jsonify({'error': 'forbidden'}), 403

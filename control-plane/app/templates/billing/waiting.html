@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Waiting for M-Pesa · FABS Deploy{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto text-center py-12">
+
+  <!-- Waiting state -->
+  <div id="waiting">
+    <div class="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto text-4xl">📱</div>
+    <h1 class="text-2xl font-semibold mt-6">Check your phone</h1>
+    <p class="text-brand-muted mt-2">
+      A payment request for <strong class="text-brand-text">KES {{ payment.amount_local|int }}</strong> was sent to your phone.
+    </p>
+    <p class="text-brand-muted mt-1 text-sm">
+      Enter your M-Pesa PIN to complete the payment.
+    </p>
+
+    <div class="mt-8 bg-white border border-brand-line rounded-xl p-6">
+      <div class="flex items-center justify-center gap-2 text-sm text-brand-muted">
+        <span class="w-2 h-2 rounded-full bg-amber-500 pulse-dot"></span>
+        <span>Waiting for confirmation…</span>
+      </div>
+      <div class="mt-3 text-xs text-brand-muted">
+        Payment reference: <span class="font-mono">FABS-{{ payment.id }}</span>
+      </div>
+    </div>
+
+    <div class="mt-6 text-xs text-brand-muted">
+      <p>Didn't receive the prompt? Check your phone has signal and try again.</p>
+      <a href="{{ url_for('billing.pay', tier=payment.plan_tier) }}"
+         class="inline-block mt-3 text-brand-red hover:underline font-medium">
+        Retry payment
+      </a>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div id="success" class="hidden">
+    <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-4xl">✓</div>
+    <h1 class="text-2xl font-semibold mt-6 text-emerald-700">Payment confirmed!</h1>
+    <p class="text-brand-muted mt-2">
+      Your <strong class="text-brand-text">{{ payment.plan_tier.replace('_', ' ').title() }}</strong> plan is now active.
+    </p>
+    <p class="text-sm text-brand-muted mt-1">Redirecting to your dashboard…</p>
+    <div class="mt-6">
+      <a href="{{ url_for('main.dashboard') }}"
+         class="inline-block bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium px-6 py-2.5 rounded-lg transition">
+        Go to dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Failed state -->
+  <div id="failed" class="hidden">
+    <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto text-4xl">✗</div>
+    <h1 class="text-2xl font-semibold mt-6 text-red-700">Payment failed</h1>
+    <p class="text-brand-muted mt-2">
+      The payment was cancelled or could not be completed.
+    </p>
+    <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{{ url_for('billing.pay', tier=payment.plan_tier) }}"
+         class="inline-block bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium px-6 py-2.5 rounded-lg transition">
+        Try again
+      </a>
+      <a href="{{ url_for('main.dashboard') }}"
+         class="inline-block border border-brand-line hover:border-brand-text text-brand-text text-sm font-medium px-6 py-2.5 rounded-lg transition">
+        Back to dashboard
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+const payId = {{ payment.id }};
+let attempts = 0;
+const maxAttempts = 100;  // ~5 minutes of polling
+
+function poll() {
+  fetch('/billing/status/' + payId, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'success') {
+        document.getElementById('waiting').classList.add('hidden');
+        document.getElementById('success').classList.remove('hidden');
+        setTimeout(() => { location.href = '{{ url_for("main.dashboard") }}'; }, 2000);
+      } else if (d.status === 'failed') {
+        document.getElementById('waiting').classList.add('hidden');
+        document.getElementById('failed').classList.remove('hidden');
+      } else {
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 3000);
+        }
+      }
+    })
+    .catch(() => {
+      attempts++;
+      if (attempts < maxAttempts) setTimeout(poll, 5000);
+    });
+}
+
+// Start polling after a small delay
+setTimeout(poll, 1500);
+</script>
+{% endblock %}

@@ -1,22 +1,131 @@
 {% extends 'base.html' %}
 {% block title %}Create account · FABS Deploy{% endblock %}
 {% block auth_content %}
-<div class="bg-white border border-brand-line rounded-2xl shadow-sm p-8">
+<div class="bg-white border border-brand-line rounded-2xl shadow-sm p-8 max-w-2xl">
   <h1 class="text-xl font-semibold">Create account</h1>
   <p class="text-sm text-brand-muted mt-1">The first account becomes the platform admin.</p>
+
   <form method="post" class="mt-6 space-y-4">
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Email</label>
-      <input name="email" type="email" required autocomplete="email" placeholder="you@example.com"
-             class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+    <!-- Honeypot (hidden from real users, bots fill it) -->
+    <div class="hidden" aria-hidden="true">
+      <label>Leave this empty</label>
+      <input type="text" name="website" value="" tabindex="-1" autocomplete="off">
     </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Full name</label>
+        <input name="name" type="text" required minlength="2" autocomplete="name"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition"
+               placeholder="Jane Doe">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Email</label>
+        <input name="email" type="email" required autocomplete="email"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition"
+               placeholder="you@example.com">
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Phone</label>
+        <input name="phone" type="tel" required autocomplete="tel" minlength="8"
+               class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition"
+               placeholder="+254 712 345 678">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Country</label>
+        <select name="country" required
+                class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+          <option value="">Select country</option>
+          <option value="KE">Kenya</option>
+          <option value="UG">Uganda</option>
+          <option value="TZ">Tanzania</option>
+          <option value="RW">Rwanda</option>
+          <option value="BI">Burundi</option>
+          <option value="SS">South Sudan</option>
+          <option value="ET">Ethiopia</option>
+          <option value="SO">Somalia</option>
+          <option value="DJ">Djibouti</option>
+          <option value="SD">Sudan</option>
+          <option value="EG">Egypt</option>
+          <option value="NG">Nigeria</option>
+          <option value="GH">Ghana</option>
+          <option value="ZA">South Africa</option>
+          <option value="ZM">Zambia</option>
+          <option value="ZW">Zimbabwe</option>
+          <option value="MZ">Mozambique</option>
+          <option value="AO">Angola</option>
+          <option value="MW">Malawi</option>
+          <option value="BW">Botswana</option>
+          <option value="NA">Namibia</option>
+          <option value="CM">Cameroon</option>
+          <option value="CI">Côte d'Ivoire</option>
+          <option value="SN">Senegal</option>
+          <option value="ML">Mali</option>
+          <option value="BF">Burkina Faso</option>
+          <option value="NE">Niger</option>
+          <option value="TD">Chad</option>
+          <option value="CD">DR Congo</option>
+          <option value="CG">Congo</option>
+          <option value="MA">Morocco</option>
+          <option value="DZ">Algeria</option>
+          <option value="TN">Tunisia</option>
+          <option value="LY">Libya</option>
+          <option value="GB">United Kingdom</option>
+          <option value="US">United States</option>
+          <option value="CA">Canada</option>
+          <option value="IN">India</option>
+          <option value="AE">United Arab Emirates</option>
+          <option value="CN">China</option>
+          <option value="JP">Japan</option>
+          <option value="DE">Germany</option>
+          <option value="FR">France</option>
+          <option value="BR">Brazil</option>
+          <option value="AU">Australia</option>
+        </select>
+      </div>
+    </div>
+
     <div>
       <label class="block text-sm font-medium mb-1.5">Password</label>
-      <input name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters"
-             class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+      <input name="password" type="password" required minlength="8" autocomplete="new-password"
+             class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition"
+             placeholder="At least 8 characters">
     </div>
-    <button class="w-full bg-brand-red hover:bg-brand-red2 text-white font-medium rounded-lg py-2.5 text-sm transition shadow-sm">Create account</button>
+
+    <div class="pt-2">
+      <label class="block text-sm font-medium mb-3">Choose your plan</label>
+      <div class="space-y-2">
+        {% for tier, plan in plans.items() %}
+          <label class="flex items-start gap-3 rounded-lg border border-brand-line p-3 cursor-pointer hover:border-brand-red/40 transition">
+            <input type="radio" name="plan_tier" value="{{ tier }}" {% if tier == 'hobby' %}checked{% endif %} required
+                   class="mt-1 accent-brand-red">
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <span class="font-medium">{{ plan.name }}</span>
+                <span class="font-semibold text-sm">
+                  {% if plan.price_usd %}${{ plan.price_usd }}<span class="text-xs text-brand-muted font-normal">/mo</span>{% else %}Free{% endif %}
+                </span>
+              </div>
+              <p class="text-xs text-brand-muted mt-0.5">{{ plan.description }}</p>
+            </div>
+          </label>
+        {% endfor %}
+      </div>
+      <p class="text-[11px] text-brand-muted mt-2">
+        Paid plans require payment confirmation. You can complete payment after creating your account.
+      </p>
+    </div>
+
+    <button class="w-full bg-brand-red hover:bg-brand-red2 text-white font-medium rounded-lg py-2.5 text-sm transition shadow-sm">
+      Create account
+    </button>
   </form>
 </div>
-<p class="text-center text-sm text-brand-muted mt-4">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-brand-red font-medium hover:underline">Sign in</a></p>
+<p class="text-center text-sm text-brand-muted mt-4">
+  Already have an account?
+  <a href="{{ url_for('auth.login') }}" class="text-brand-red font-medium hover:underline">Sign in</a>
+</p>
 {% endblock %}

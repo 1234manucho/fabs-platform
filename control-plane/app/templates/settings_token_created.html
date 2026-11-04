@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Token created · FABS Deploy{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+  <div class="mb-8">
+    <div class="text-xs uppercase tracking-wider text-brand-red font-semibold">Success</div>
+    <h1 class="text-2xl font-semibold tracking-tight mt-1">Your API token is ready</h1>
+    <p class="text-sm text-brand-muted mt-1">Copy it now. It will not be shown again.</p>
+  </div>
+
+  <div class="bg-brand-redSoft border border-brand-red/20 rounded-xl p-4 mb-4">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 text-brand-red shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+      </svg>
+      <p class="text-sm text-brand-red3">This is the only time you will see this token. Store it in a password manager.</p>
+    </div>
+  </div>
+
+  <div class="bg-white border border-brand-line rounded-xl p-6 mb-6">
+    <div class="text-[11px] uppercase tracking-wider text-brand-muted font-medium mb-2">Token for: {{ token.name }}</div>
+    <div class="flex items-stretch gap-2">
+      <code id="raw-token" class="flex-1 bg-brand-surface border border-brand-line rounded-lg px-3 py-2.5 font-mono text-xs break-all">{{ raw }}</code>
+      <button onclick="copyToken(event)" class="bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium px-4 rounded-lg transition whitespace-nowrap">
+        Copy
+      </button>
+    </div>
+  </div>
+
+  <div class="bg-brand-surface border border-brand-line rounded-xl p-6 mb-6">
+    <h3 class="text-sm font-semibold mb-2">How to use it</h3>
+    <pre class="bg-brand-text text-gray-300 p-3 font-mono text-xs overflow-x-auto rounded">curl https://platform.fabsdatawarehouse.com/api/v1/me \
+  -H "Authorization: Bearer {{ raw }}"</pre>
+  </div>
+
+  <a href="{{ url_for('main.settings_tokens') }}" class="inline-block bg-brand-text text-white text-sm font-medium px-5 py-2.5 hover:bg-black transition">
+    I've saved it — back to tokens
+  </a>
+</div>
+
+<script>
+function copyToken(e) {
+  const text = document.getElementById('raw-token').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = e.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+</script>
+{% endblock %}

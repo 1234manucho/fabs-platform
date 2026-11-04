@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Payment history · FABS Deploy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+  <div class="mb-8">
+    <div class="text-xs uppercase tracking-wider text-brand-red font-semibold">Billing</div>
+    <h1 class="text-2xl font-semibold tracking-tight mt-1">Payment history</h1>
+    <p class="text-sm text-brand-muted mt-1">
+      All transactions on your account. Payments are processed by Safaricom M-Pesa or DPO Pay.
+    </p>
+  </div>
+
+  {% if not payments %}
+    <div class="border border-dashed border-brand-line rounded-2xl p-12 text-center bg-white">
+      <div class="w-12 h-12 rounded-xl bg-brand-surface2 flex items-center justify-center mx-auto text-brand-muted">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>
+        </svg>
+      </div>
+      <h2 class="text-base font-semibold mt-4">No payments yet</h2>
+      <p class="text-sm text-brand-muted mt-1">Your transaction history will appear here.</p>
+      {% if current_user.plan == 'hobby' %}
+        <a href="{{ url_for('main.home') }}#pricing"
+           class="inline-block mt-5 bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition">
+          View plans
+        </a>
+      {% endif %}
+    </div>
+  {% else %}
+    <!-- Summary cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+      <div class="bg-white border border-brand-line rounded-xl p-4">
+        <div class="text-[11px] uppercase tracking-wider text-brand-muted">Total paid</div>
+        <div class="text-xl font-semibold mt-1.5">
+          ${{ "%.2f"|format(payments|selectattr('status', 'equalto', 'success')|sum(attribute='amount_usd')) }}
+        </div>
+      </div>
+      <div class="bg-white border border-brand-line rounded-xl p-4">
+        <div class="text-[11px] uppercase tracking-wider text-brand-muted">Successful</div>
+        <div class="text-xl font-semibold mt-1.5 text-emerald-600">
+          {{ payments|selectattr('status', 'equalto', 'success')|list|length }}
+        </div>
+      </div>
+      <div class="bg-white border border-brand-line rounded-xl p-4">
+        <div class="text-[11px] uppercase tracking-wider text-brand-muted">Pending</div>
+        <div class="text-xl font-semibold mt-1.5 text-amber-600">
+          {{ payments|selectattr('status', 'equalto', 'pending')|list|length }}
+        </div>
+      </div>
+      <div class="bg-white border border-brand-line rounded-xl p-4">
+        <div class="text-[11px] uppercase tracking-wider text-brand-muted">Failed</div>
+        <div class="text-xl font-semibold mt-1.5 text-red-600">
+          {{ payments|selectattr('status', 'equalto', 'failed')|list|length }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment table -->
+    <div class="overflow-hidden rounded-xl border border-brand-line bg-white">
+      <table class="w-full text-sm">
+        <thead class="bg-brand-surface text-left text-[11px] uppercase tracking-wider text-brand-muted">
+          <tr>
+            <th class="px-4 py-3 font-medium">Date</th>
+            <th class="px-4 py-3 font-medium">Plan</th>
+            <th class="px-4 py-3 font-medium">Amount</th>
+            <th class="px-4 py-3 font-medium">Provider</th>
+            <th class="px-4 py-3 font-medium">Reference</th>
+            <th class="px-4 py-3 font-medium">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-brand-line">
+          {% for p in payments %}
+            <tr class="hover:bg-brand-surface/50">
+              <td class="px-4 py-3 text-xs text-brand-muted whitespace-nowrap">
+                {{ p.created_at.strftime('%b %d, %Y') }}<br>
+                <span class="text-[10px]">{{ p.created_at.strftime('%H:%M') }}</span>
+              </td>
+              <td class="px-4 py-3 font-medium">
+                {{ p.plan_tier.replace('_', ' ').title() }}
+              </td>
+              <td class="px-4 py-3">
+                <div class="font-mono">${{ "%.2f"|format(p.amount_usd) }}</div>
+                {% if p.amount_local %}
+                  <div class="text-[11px] text-brand-muted font-mono">KES {{ p.amount_local|int }}</div>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3">
+                {% if p.provider == 'mpesa' %}
+                  <span class="inline-flex items-center gap-1.5 text-xs">
+                    <span class="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-[9px] font-bold">M</span>
+                    M-Pesa
+                  </span>
+                {% elif p.provider == 'dpo' %}
+                  <span class="inline-flex items-center gap-1.5 text-xs">
+                    <span class="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-[9px] font-bold">D</span>
+                    Card
+                  </span>
+                {% else %}
+                  <span class="text-xs text-brand-muted">{{ p.provider }}</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 font-mono text-xs text-brand-muted">
+                {% if p.provider_ref %}
+                  <span title="{{ p.provider_ref }}">{{ p.provider_ref[:16] }}{% if p.provider_ref|length > 16 %}…{% endif %}</span>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="px-4 py-3">
+                {% if p.status == 'success' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    Success
+                  </span>
+                {% elif p.status == 'pending' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 pulse-dot"></span>
+                    Pending
+                  </span>
+                {% elif p.status == 'failed' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    Failed
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-brand-surface2 text-brand-muted ring-1 ring-inset ring-brand-line">
+                    {{ p.status }}
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-xs text-brand-muted mt-4">
+      Need a receipt? Email <a href="mailto:support@fabsdatawarehouse.com" class="text-brand-red hover:underline">support@fabsdatawarehouse.com</a> with your payment reference.
+    </p>
+  {% endif %}
+
+  <div class="mt-8 flex items-center justify-between text-xs text-brand-muted">
+    <a href="{{ url_for('main.dashboard') }}" class="hover:text-brand-text">← Back to dashboard</a>
+    {% if current_user.plan == 'hobby' %}
+      <a href="{{ url_for('main.home') }}#pricing" class="text-brand-red hover:underline">Upgrade plan</a>
+    {% else %}
+      <a href="{{ url_for('billing.pay', tier=current_user.plan) }}" class="hover:text-brand-text">Manage subscription</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

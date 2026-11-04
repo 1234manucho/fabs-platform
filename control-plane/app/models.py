@@ -9,10 +9,19 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Profile
+    name = db.Column(db.String(100))
+    phone = db.Column(db.String(30))
+    country = db.Column(db.String(2))
+    signup_ip = db.Column(db.String(45))
+
+    # Roles & billing
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     stripe_customer_id = db.Column(db.String(255), unique=True, index=True)
     plan = db.Column(db.String(50), default='hobby', nullable=False)
     subscription_status = db.Column(db.String(50), default='inactive', nullable=False)
+
     projects = db.relationship(
         'Project', backref='owner', lazy=True, cascade='all, delete-orphan'
     )
@@ -24,8 +33,16 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     @property
+    def is_paid(self):
+        return (
+            self.plan in ('basic', 'pro', 'pro_plus', 'ultimate')
+            and self.subscription_status == 'active'
+        )
+
+    @property
     def is_pro(self):
-        return self.plan == 'pro' and self.subscription_status == 'active'
+        # Backwards-compatible alias for old code
+        return self.is_paid
 
 
 class Project(db.Model):
@@ -107,3 +124,20 @@ class ApiToken(db.Model):
     token_hash = db.Column(db.String(255), nullable=False, unique=True, index=True)
     last_used_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    plan_tier = db.Column(db.String(50), nullable=False)
+    amount_usd = db.Column(db.Numeric(10, 2), nullable=False)
+    amount_local = db.Column(db.Numeric(10, 2))
+    currency = db.Column(db.String(10), default='USD')
+    provider = db.Column(db.String(20), nullable=False)  # 'mpesa' or 'dpo'
+    provider_ref = db.Column(db.String(255), index=True)  # CheckoutRequestID (M-Pesa) or TransToken (DPO)
+    status = db.Column(db.String(50), default='pending')  # pending, success, failed
+    raw_response = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    finished_at = db.Column(db.DateTime)
+
+    user = db.relationship('User', backref='payments')
