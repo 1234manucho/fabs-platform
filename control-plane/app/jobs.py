@@ -133,3 +133,45 @@ def deploy(project_id, deployment_id):
             db.session.commit()
         finally:
             shutil.rmtree(workdir, ignore_errors=True)
+
+
+def delete_docker_resources(project_id, container_name):
+    """
+    Stop & remove the running container and all images for a deleted project.
+    Runs on the worker (which has /var/run/docker.sock mounted).
+    All failures are swallowed — a deleted project shouldn't error the queue.
+    """
+    try:
+        client = docker.from_env()
+    except Exception:
+        return
+
+    # 1. Stop + remove the container
+    if container_name:
+        try:
+            c = client.containers.get(container_name)
+            try:
+                c.stop(timeout=10)
+            except Exception:
+                pass
+            try:
+                c.remove(force=True)
+            except Exception:
+                pass
+        except docker.errors.NotFound:
+            pass
+        except Exception:
+            pass
+
+    # 2. Remove images tagged deploy-{project_id}:*
+    try:
+        prefix = f'deploy-{project_id}:'
+        for img in client.images.list():
+            for tag in (img.tags or []):
+                if tag.startswith(prefix):
+                    try:
+                        client.images.remove(img.id, force=True)
+                    except Exception:
+                        pass
+    except Exception:
+        pass

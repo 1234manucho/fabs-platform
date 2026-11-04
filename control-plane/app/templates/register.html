@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Create account · FABS Deploy{% endblock %}
+{% block auth_content %}
+<div class="bg-white border border-brand-line rounded-2xl shadow-sm p-8">
+  <h1 class="text-xl font-semibold">Create account</h1>
+  <p class="text-sm text-brand-muted mt-1">The first account becomes the platform admin.</p>
+  <form method="post" class="mt-6 space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-1.5">Email</label>
+      <input name="email" type="email" required autocomplete="email" placeholder="you@example.com"
+             class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1.5">Password</label>
+      <input name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters"
+             class="w-full rounded-lg border border-brand-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+    </div>
+    <button class="w-full bg-brand-red hover:bg-brand-red2 text-white font-medium rounded-lg py-2.5 text-sm transition shadow-sm">Create account</button>
+  </form>
+</div>
+<p class="text-center text-sm text-brand-muted mt-4">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-brand-red font-medium hover:underline">Sign in</a></p>
+{% endblock %}

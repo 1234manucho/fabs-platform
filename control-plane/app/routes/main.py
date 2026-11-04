@@ -4,7 +4,6 @@ from app.models import Project
 
 bp = Blueprint('main', __name__)
 
-
 @bp.route('/')
 @login_required
 def dashboard():

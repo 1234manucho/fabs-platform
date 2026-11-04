@@ -9,14 +9,16 @@ services:
       POSTGRES_DB: deploy
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks: [internal]
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
+    networks: [internal]
     restart: unless-stopped
 
   traefik:
-    image: traefik:v3.1
+    image: traefik:v3.6.1
     command:
       - --api.dashboard=false
       - --providers.docker=true
@@ -40,7 +42,7 @@ services:
 
   web:
     build: ./control-plane
-    command: gunicorn -b 0.0.0.0:5000 -w 2 run:app
+    command: gunicorn -b 0.0.0.0:5000 -w 1 --capture-output run:app
     environment:
       DATABASE_URL: postgresql://deploy:${POSTGRES_PASSWORD}@postgres/deploy
       REDIS_URL: redis://redis:6379/0

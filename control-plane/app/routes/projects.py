@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, render_template, request, redirect, url_for,
-    jsonify, current_app,
+    jsonify, current_app, flash,
 )
 from flask_login import login_required, current_user
 from app import db
@@ -57,6 +57,31 @@ def deploy(project_id):
         deploy_job, project.id, deployment.id, job_timeout=900
     )
     return jsonify({'deployment_id': deployment.id})
+
+
+@bp.route('/projects/<int:project_id>/delete', methods=['POST'])
+@login_required
+def delete(project_id):
+    project = Project.query.filter_by(
+        id=project_id, user_id=current_user.id
+    ).first_or_404()
+
+    project_name = project.name
+    container_name = project.container_name or f'project-{project.id}'
+    pid = project.id
+
+    # Delete from DB first (cascades to deployments)
+    db.session.delete(project)
+    db.session.commit()
+
+    # Enqueue Docker cleanup on the worker
+    from app.jobs import delete_docker_resources
+    current_app.queue.enqueue(
+        delete_docker_resources, pid, container_name, job_timeout=120
+    )
+
+    flash(f'Project "{project_name}" deleted.')
+    return redirect(url_for('main.dashboard'))
 
 
 @bp.route('/deployments/<int:deployment_id>/logs')
