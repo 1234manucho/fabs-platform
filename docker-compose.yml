@@ -42,7 +42,9 @@ services:
 
   web:
     build: ./control-plane
-    command: gunicorn -b 0.0.0.0:5000 -w 1 --capture-output run:app
+    command: gunicorn -b 0.0.0.0:5000 -w 2 --preload --capture-output run:app
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql://deploy:${POSTGRES_PASSWORD}@postgres/deploy
       REDIS_URL: redis://redis:6379/0
@@ -62,6 +64,8 @@ services:
   worker:
     build: ./control-plane
     command: python worker.py
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql://deploy:${POSTGRES_PASSWORD}@postgres/deploy
       REDIS_URL: redis://redis:6379/0
