@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-white">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ED3138">
+  <meta name="color-scheme" content="light">
+  <title>FABS Deploy · Your fastest path to production</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg:'#FFFFFF', surface:'#F5F6F7', surface2:'#ECEEF1', surface3:'#E3E6EA',
+              line:'#DFE3E8', line2:'#BEC5CD', text:'#121820', muted:'#59636F', muted2:'#69717A',
+              red:'#ED3138', red2:'#C9252D', red3:'#AC1B23', redSoft:'#FFF0F1',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          boxShadow: {
+            soft: '0 4px 16px rgba(18,24,32,.06)',
+            card: '0 8px 30px rgba(18,24,32,.08)',
+            red: '0 8px 32px -10px rgba(237,49,56,.25)',
+            redSm: '0 4px 16px -6px rgba(237,49,56,.2)',
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .sharp-corner { border-radius: 0px; }
+    .bg-grid { background-image: linear-gradient(#DFE3E8 1px, transparent 1px), linear-gradient(90deg, #DFE3E8 1px, transparent 1px); background-size: 48px 48px; }
+  </style>
+</head>
+<body class="font-sans text-brand-text antialiased bg-brand-bg">
+
+  {% if preview %}
+  <div class="bg-brand-text text-white text-sm">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-between">
+      <span class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        Previewing the public homepage
+      </span>
+      <a href="{{ url_for('main.dashboard') }}" class="text-xs font-medium underline hover:no-underline">← Back to dashboard</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Announcement bar -->
+  <div class="bg-brand-text text-white text-xs">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-center gap-2">
+      <span class="w-1.5 h-1.5 rounded-full bg-brand-red"></span>
+      <span>Launch offer: Free hosting for your first 3 projects.</span>
+      <a href="{{ url_for('auth.register') }}" class="underline font-medium hover:no-underline">Get started →</a>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-brand-bg/90 backdrop-blur border-b border-brand-line">
+    <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-10">
+        <a href="/" class="flex items-center gap-2.5">
+          <div class="w-7 h-7 bg-brand-red flex items-center justify-center text-white text-sm font-black">F</div>
+          <div class="leading-tight">
+            <div class="font-semibold text-brand-text">FABS <span class="text-brand-red">DEPLOY</span></div>
+            <div class="text-[10px] font-medium tracking-wider text-brand-muted uppercase">Data Warehouse</div>
+          </div>
+        </a>
+        <div class="hidden lg:flex items-center gap-7 text-sm font-medium text-brand-muted">
+          <a href="#product" class="hover:text-brand-text transition">Product</a>
+          <a href="#solutions" class="hover:text-brand-text transition">Solutions</a>
+          <a href="#features" class="hover:text-brand-text transition">Features</a>
+          <a href="#pricing" class="hover:text-brand-text transition">Pricing</a>
+          <a href="#docs" class="hover:text-brand-text transition">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        {% if preview %}
+          <a href="{{ url_for('main.dashboard') }}" class="sharp-corner bg-brand-text text-white text-sm font-medium px-5 py-2.5 hover:bg-black transition">Dashboard →</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text transition">Sign in</a>
+          <a href="{{ url_for('auth.register') }}" class="sharp-corner bg-brand-red text-white text-sm font-medium px-5 py-2.5 hover:bg-brand-red2 transition shadow-redSm">Get Started</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="max-w-7xl mx-auto px-6 pt-20 pb-16">
+      <div class="grid lg:grid-cols-2 gap-14 items-center">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 bg-brand-redSoft border border-brand-red/20 text-brand-red3 text-xs font-medium mb-6">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-red"></span>
+            Built in Kenya · Serving builders across Africa
+          </div>
+          <h1 class="text-5xl md:text-7xl font-light tracking-[-0.03em] leading-[0.95]">
+            Your fastest path to <span class="text-brand-red">production</span>.
+          </h1>
+          <p class="mt-8 text-lg text-brand-muted max-w-lg leading-relaxed">
+            Deploy your Flask, Node, or Docker applications in minutes. Automatic SSL, managed databases, and live logs — on infrastructure you control.
+          </p>
+          <div class="mt-10 flex flex-col sm:flex-row gap-3">
+            <a href="{{ url_for('auth.register') }}" class="sharp-corner bg-brand-red text-white text-center font-medium px-6 py-3 hover:bg-brand-red2 transition shadow-redSm">
+              Start for free
+            </a>
+            <a href="mailto:sales@fabsdatawarehouse.com" class="sharp-corner border border-brand-line text-brand-text text-center font-medium px-6 py-3 hover:border-brand-muted transition">
+              Talk to sales
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero visual: service status + terminal -->
+        <div class="bg-white border border-brand-line shadow-card">
+          <div class="flex items-center justify-between border-b border-brand-line px-5 py-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full"></span>
+              <span class="text-xs font-semibold tracking-wider">PRODUCTION</span>
+            </div>
+            <span class="text-xs font-mono text-brand-muted">fabs-platform</span>
+          </div>
+          <div class="p-5 space-y-2 text-sm">
+            <div class="flex items-center justify-between p-3 bg-brand-surface border border-brand-line">
+              <span class="font-mono">web</span>
+              <span class="text-emerald-600 font-medium text-xs">● Available</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-brand-surface border border-brand-line">
+              <span class="font-mono">worker</span>
+              <span class="text-emerald-600 font-medium text-xs">● Available</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-brand-surface border border-brand-line">
+              <span class="font-mono">db-1</span>
+              <span class="text-emerald-600 font-medium text-xs">● Available</span>
+            </div>
+          </div>
+          <div class="px-5 py-4 border-t border-brand-line bg-brand-surface">
+            <div class="text-xs font-mono text-brand-muted mb-2">$ git push origin main</div>
+            <div class="text-xs font-mono text-emerald-600">→ Build succeeded · deployed in 24s</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUSTED BY / TECH STACK -->
+    <section class="border-t border-brand-line bg-brand-surface py-10">
+      <div class="max-w-7xl mx-auto px-6">
+        <p class="text-center text-xs uppercase tracking-wider text-brand-muted font-semibold mb-6">
+          Powered by trusted infrastructure
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 opacity-70">
+          <span class="text-2xl font-bold text-brand-text">Docker</span>
+          <span class="text-2xl font-bold text-brand-text">PostgreSQL</span>
+          <span class="text-2xl font-bold text-brand-text">Traefik</span>
+          <span class="text-2xl font-bold text-brand-text">Flask</span>
+          <span class="text-2xl font-bold text-brand-text">Node.js</span>
+          <span class="text-2xl font-bold text-brand-text">GitHub</span>
+          <span class="text-2xl font-bold text-brand-text">Ubuntu</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3-STEP HOW IT WORKS -->
+    <section id="product" class="max-w-7xl mx-auto px-6 py-24">
+      <div class="max-w-2xl mb-16">
+        <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">How it works</div>
+        <h2 class="text-4xl md:text-5xl font-light tracking-tight">Click, click, done.</h2>
+        <p class="text-brand-muted mt-4 text-lg">Deploy your app in three simple steps.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <div class="w-10 h-10 bg-brand-red text-white flex items-center justify-center font-bold text-lg mb-5">1</div>
+          <h3 class="font-semibold text-xl mb-2">Select a service</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">
+            Choose what you need to run — web apps, APIs, background workers, or PostgreSQL databases.
+          </p>
+        </div>
+        <div>
+          <div class="w-10 h-10 bg-brand-red text-white flex items-center justify-center font-bold text-lg mb-5">2</div>
+          <h3 class="font-semibold text-xl mb-2">Deploy your code</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">
+            Connect your GitHub repository. We auto-detect your stack and build the right Docker image.
+          </p>
+        </div>
+        <div>
+          <div class="w-10 h-10 bg-brand-red text-white flex items-center justify-center font-bold text-lg mb-5">3</div>
+          <h3 class="font-semibold text-xl mb-2">FABS does the rest</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">
+            Automatic TLS, custom domains, managed databases, and continuous deploys on every push.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STACK SECTION -->
+    <section class="border-t border-brand-line bg-brand-surface">
+      <div class="max-w-7xl mx-auto px-6 py-24">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+          <div class="max-w-2xl">
+            <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Stack</div>
+            <h2 class="text-4xl md:text-5xl font-light tracking-tight">Whatever your stack, it runs here.</h2>
+          </div>
+          <a href="#" class="text-sm font-medium text-brand-red hover:text-brand-red2 transition">View supported frameworks →</a>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-4">
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-xs font-mono text-brand-muted mb-2">Python</div>
+            <div class="font-semibold">Flask, FastAPI, Django</div>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-xs font-mono text-brand-muted mb-2">Node.js</div>
+            <div class="font-semibold">Express, Next.js, Fastify</div>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-xs font-mono text-brand-muted mb-2">Docker</div>
+            <div class="font-semibold">Any Dockerfile</div>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-xs font-mono text-brand-muted mb-2">Data</div>
+            <div class="font-semibold">PostgreSQL 16</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE SHOWCASE BLOCK 1: Managed Postgres -->
+    <section class="max-w-7xl mx-auto px-6 py-24 border-t border-brand-line">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Databases</div>
+          <h2 class="text-3xl md:text-4xl font-light tracking-tight">Enterprise-grade PostgreSQL, one click away.</h2>
+          <p class="text-brand-muted mt-6 leading-relaxed">
+            Deploy fully-managed Postgres databases on the same private network as your apps. Connection strings are auto-injected into your environment. Backups and point-in-time recovery coming soon.
+          </p>
+          <ul class="mt-8 space-y-3 text-sm">
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> One-click provisioning</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Auto-generated credentials</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Private network isolation</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Connection string auto-injected as <code class="font-mono text-xs bg-brand-surface px-1.5 py-0.5">DATABASE_URL</code></li>
+          </ul>
+        </div>
+        <div class="bg-brand-surface border border-brand-line p-8">
+          <div class="bg-white border border-brand-line p-5 font-mono text-xs leading-relaxed">
+            <div class="text-brand-muted mb-2">-- Creating database...</div>
+            <div class="text-emerald-600">✓ Container started (db-1)</div>
+            <div class="text-emerald-600">✓ Volume mounted</div>
+            <div class="text-emerald-600">✓ Credentials generated</div>
+            <div class="text-emerald-600">✓ DATABASE_URL injected</div>
+            <div class="mt-3 pt-3 border-t border-brand-line text-brand-text">
+              DATABASE_URL=postgresql://user_1:•••@db-1:5432/db_1
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE SHOWCASE BLOCK 2: Live Logs -->
+    <section class="bg-brand-surface border-t border-brand-line">
+      <div class="max-w-7xl mx-auto px-6 py-24">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="order-2 lg:order-1 bg-brand-text border border-brand-line p-6">
+            <div class="flex items-center gap-2 mb-3 pb-3 border-b border-gray-800">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="text-xs text-gray-400 font-mono">deployment #42</span>
+            </div>
+            <div class="font-mono text-xs text-gray-300 space-y-1.5 leading-relaxed">
+              <div><span class="text-emerald-400">→</span> Cloning repo...</div>
+              <div><span class="text-emerald-400">→</span> No Dockerfile found, generating one</div>
+              <div><span class="text-emerald-400">→</span> Building image deploy-1:42</div>
+              <div><span class="text-gray-500">Step 1/6: FROM python:3.11-slim</span></div>
+              <div><span class="text-gray-500">Step 2/6: WORKDIR /app</span></div>
+              <div><span class="text-gray-500">Step 3/6: RUN pip install -r requirements.txt</span></div>
+              <div><span class="text-emerald-400">→</span> Injecting 2 environment variable(s)</div>
+              <div><span class="text-emerald-400">→</span> Starting new container</div>
+              <div class="text-emerald-300 font-semibold">Deployment successful.</div>
+            </div>
+          </div>
+          <div class="order-1 lg:order-2">
+            <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Observability</div>
+            <h2 class="text-3xl md:text-4xl font-light tracking-tight">Integrated logs for every build and deploy.</h2>
+            <p class="text-brand-muted mt-6 leading-relaxed">
+              Stream build and runtime logs in real time. Full history retained per deployment with copy and search. Debug faster with everything you need in one place.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE SHOWCASE BLOCK 3: Environment variables -->
+    <section class="max-w-7xl mx-auto px-6 py-24 border-t border-brand-line">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Configuration</div>
+          <h2 class="text-3xl md:text-4xl font-light tracking-tight">Environment variables, without the spreadsheets.</h2>
+          <p class="text-brand-muted mt-6 leading-relaxed">
+            Inject secrets per project. Masked values with reveal-on-demand. Automatically applied at container start on every deploy — no manual .env file handling.
+          </p>
+        </div>
+        <div class="bg-white border border-brand-line">
+          <div class="border-b border-brand-line px-5 py-3 flex items-center justify-between">
+            <span class="text-xs font-semibold">Environment variables</span>
+            <span class="text-xs text-brand-muted">project: fabsdatawarehouse</span>
+          </div>
+          <div class="p-5 space-y-2 text-sm">
+            <div class="flex items-center justify-between p-3 bg-brand-surface border border-brand-line">
+              <span class="font-mono">DATABASE_URL</span>
+              <span class="font-mono text-brand-muted">••••••••</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-brand-surface border border-brand-line">
+              <span class="font-mono">SECRET_KEY</span>
+              <span class="font-mono text-brand-muted">••••••••</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-brand-surface border border-brand-line">
+              <span class="font-mono">STRIPE_API_KEY</span>
+              <span class="font-mono text-brand-muted">••••••••</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES GRID -->
+    <section id="features" class="bg-brand-surface border-t border-brand-line">
+      <div class="max-w-7xl mx-auto px-6 py-24">
+        <div class="max-w-2xl mb-16">
+          <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Features</div>
+          <h2 class="text-4xl md:text-5xl font-light tracking-tight">Intuitive infrastructure, designed for builders.</h2>
+          <p class="text-brand-muted mt-4 text-lg">Ship software faster with integrated primitives that just work.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-brand-red text-2xl mb-3 font-light">◆</div>
+            <h3 class="font-semibold mb-1.5">Native language runtimes</h3>
+            <p class="text-xs text-brand-muted leading-relaxed">Auto-detected builds for Python, Node, and Docker.</p>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-brand-red text-2xl mb-3 font-light">◆</div>
+            <h3 class="font-semibold mb-1.5">Zero-downtime deploys</h3>
+            <p class="text-xs text-brand-muted leading-relaxed">New containers replace old ones without dropping requests.</p>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-brand-red text-2xl mb-3 font-light">◆</div>
+            <h3 class="font-semibold mb-1.5">Fully-managed TLS</h3>
+            <p class="text-xs text-brand-muted leading-relaxed">Free SSL certificates from Let's Encrypt for every domain.</p>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-brand-red text-2xl mb-3 font-light">◆</div>
+            <h3 class="font-semibold mb-1.5">Managed databases</h3>
+            <p class="text-xs text-brand-muted leading-relaxed">PostgreSQL on the same private network as your apps.</p>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-brand-red text-2xl mb-3 font-light">◆</div>
+            <h3 class="font-semibold mb-1.5">Environment variables</h3>
+            <p class="text-xs text-brand-muted leading-relaxed">Per-project secrets, masked by default.</p>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-brand-red text-2xl mb-3 font-light">◆</div>
+            <h3 class="font-semibold mb-1.5">Live logs</h3>
+            <p class="text-xs text-brand-muted leading-relaxed">Build and runtime logs, streamed in real time.</p>
+          </div>
+          <div class="bg-white border border-brand-line p-6">
+            <div class="text-brand-red text-2xl mb-3 font-light">◆</div>
+            <h3 class="font-semibold mb-1.5">Custom domains</h3>
+            <p class="text-xs text-brand-muted leading-relaxed">Attach any domain via wildcard DNS + automatic routing.</p>
+          </div>
+          <div class="bg-white border border-brand-line p-6 relative">
+            <div class="absolute top-4 right-4 text-[10px] font-medium uppercase tracking-wider text-brand-muted bg-brand-surface2 px-2 py-0.5">Soon</div>
+            <div class="text-brand-muted text-2xl mb-3 font-light">◆</div>
+            <h3 class="font-semibold mb-1.5 text-brand-muted">Preview environments</h3>
+            <p class="text-xs text-brand-muted leading-relaxed">Ephemeral environments for every pull request.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section id="solutions" class="max-w-7xl mx-auto px-6 py-24 border-t border-brand-line">
+      <div class="max-w-2xl mb-16">
+        <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Security</div>
+        <h2 class="text-4xl md:text-5xl font-light tracking-tight">Stay secure and resilient by default.</h2>
+        <p class="text-brand-muted mt-4 text-lg">Build products, not compliance overhead.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white border border-brand-line p-6">
+          <h3 class="font-semibold mb-2">Private networking</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Internal traffic between your app and database stays off the public internet.</p>
+        </div>
+        <div class="bg-white border border-brand-line p-6">
+          <h3 class="font-semibold mb-2">Docker isolation</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Every project runs in its own container, isolated from every other project.</p>
+        </div>
+        <div class="bg-white border border-brand-line p-6">
+          <h3 class="font-semibold mb-2">Fully-managed TLS</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Free, auto-renewing SSL certificates for every domain and subdomain.</p>
+        </div>
+        <div class="bg-white border border-brand-line p-6">
+          <h3 class="font-semibold mb-2">Password hashing</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Credentials hashed with bcrypt-style algorithms, never stored in plain text.</p>
+        </div>
+        <div class="bg-white border border-brand-line p-6">
+          <h3 class="font-semibold mb-2">HTTPS everywhere</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">HTTP traffic is redirected to HTTPS by default. No mixed content.</p>
+        </div>
+        <div class="bg-white border border-brand-line p-6">
+          <h3 class="font-semibold mb-2">Managed secrets</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Environment variables are masked in the UI. Reveal requires an authenticated session.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" class="bg-brand-surface border-t border-brand-line">
+      <div class="max-w-7xl mx-auto px-6 py-24">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <div class="text-xs uppercase tracking-wider text-brand-red font-semibold mb-3">Pricing</div>
+          <h2 class="text-4xl md:text-5xl font-light tracking-tight">Pay for what you use.</h2>
+          <p class="text-brand-muted mt-4 text-lg">Start free. Scale when you need to.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div class="bg-white border border-brand-line p-8">
+            <div class="text-sm font-semibold text-brand-muted mb-1">Hobby</div>
+            <div class="text-4xl font-light mb-6">$0<span class="text-base text-brand-muted">/mo</span></div>
+            <p class="text-sm text-brand-muted mb-6">For personal projects and prototypes.</p>
+            <ul class="space-y-3 text-sm mb-8">
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Unlimited projects</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Auto-deploy from GitHub</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Free SSL</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Live logs & history</li>
+            </ul>
+            <a href="{{ url_for('auth.register') }}" class="block text-center border border-brand-line py-2.5 text-sm font-medium hover:border-brand-text transition">Get started</a>
+          </div>
+
+          <div class="bg-brand-text text-white p-8 relative shadow-card">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-red text-white text-xs font-medium px-3 py-1">Popular</div>
+            <div class="text-sm font-semibold text-brand-red mb-1">Pro</div>
+            <div class="text-4xl font-light mb-6">$25<span class="text-base text-white/60">/mo</span></div>
+            <p class="text-sm text-white/70 mb-6">For production apps and small teams.</p>
+            <ul class="space-y-3 text-sm mb-8">
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Everything in Hobby</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Managed PostgreSQL</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Environment variables</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Priority support</li>
+            </ul>
+            <a href="{{ url_for('auth.register') }}" class="block text-center bg-brand-red py-2.5 text-sm font-medium hover:bg-brand-red2 transition shadow-redSm">Upgrade to Pro</a>
+          </div>
+
+          <div class="bg-white border border-brand-line p-8">
+            <div class="text-sm font-semibold text-brand-muted mb-1">Enterprise</div>
+            <div class="text-4xl font-light mb-6">Custom</div>
+            <p class="text-sm text-brand-muted mb-6">Dedicated infrastructure and SLA.</p>
+            <ul class="space-y-3 text-sm mb-8">
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Everything in Pro</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Dedicated VPS</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> 99.9% uptime SLA</li>
+              <li class="flex items-start gap-2"><span class="text-brand-red">→</span> Priority support</li>
+            </ul>
+            <a href="mailto:sales@fabsdatawarehouse.com" class="block text-center border border-brand-line py-2.5 text-sm font-medium hover:border-brand-text transition">Contact sales</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="max-w-7xl mx-auto px-6 py-24 border-t border-brand-line">
+      <div class="bg-brand-text text-white p-12 md:p-20 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-grid opacity-[0.03]"></div>
+        <div class="relative">
+          <h2 class="text-4xl md:text-6xl font-light tracking-tight max-w-3xl mx-auto leading-tight">
+            Start building with FABS Deploy.
+          </h2>
+          <p class="text-white/70 mt-6 text-lg max-w-xl mx-auto">Zero ops, zero surprises. Deploy your app for free.</p>
+          <div class="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{{ url_for('auth.register') }}" class="sharp-corner bg-brand-red text-white font-medium px-8 py-4 hover:bg-brand-red2 transition shadow-red">
+              Deploy your app for free
+            </a>
+            <a href="mailto:sales@fabsdatawarehouse.com" class="sharp-corner border border-white/20 text-white font-medium px-8 py-4 hover:border-white transition">
+              Talk to sales
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-brand-line">
+    <div class="max-w-7xl mx-auto px-6 py-16">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-10 mb-12">
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Services</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Web Services</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Private Services</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Background Workers</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">PostgreSQL</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Cron Jobs <span class="text-[10px] text-brand-muted">Soon</span></a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Features</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Zero-Downtime Deploys</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Environment Variables</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Docker Support</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Private Networking</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Autoscaling <span class="text-[10px] text-brand-muted">Soon</span></a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Developers</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Docs</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Framework Quickstarts</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Changelog</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Resources</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#pricing" class="text-brand-text hover:text-brand-red transition">Pricing</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Customers</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Migration Guide</a></li>
+            <li><a href="mailto:support@fabsdatawarehouse.com" class="text-brand-text hover:text-brand-red transition">Support</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-brand-muted font-semibold mb-4">Company</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">About FABS Trading</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Contact</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Privacy Policy</a></li>
+            <li><a href="#" class="text-brand-text hover:text-brand-red transition">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-brand-line flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-brand-muted">
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 bg-brand-red flex items-center justify-center text-white text-[10px] font-black">F</div>
+          <span>&copy; 2026 FABS Trading · Data Warehouse</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="text-xs">All systems operational</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
