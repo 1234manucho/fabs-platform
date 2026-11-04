@@ -72,6 +72,45 @@
 {% endif %}
 
 
+<!-- Environment variables -->
+<div class="bg-white border border-brand-line rounded-2xl p-6 mb-8">
+  <div class="mb-4">
+    <h2 class="text-sm font-semibold">Environment variables</h2>
+    <p class="text-xs text-brand-muted mt-0.5">Injected into the container at deploy time. Redeploy to apply changes.</p>
+  </div>
+
+  {% if project.env_vars %}
+    <div class="mb-4 divide-y divide-brand-line border border-brand-line rounded-lg overflow-hidden">
+      {% for ev in project.env_vars|sort(attribute='key') %}
+        <div class="flex items-center gap-3 px-3 py-2.5 bg-white">
+          <code class="font-mono text-sm text-brand-text flex-1 min-w-0 truncate">{{ ev.key }}</code>
+          <code class="font-mono text-xs text-brand-muted truncate max-w-xs" data-value="{{ ev.value }}">••••••••</code>
+          <button type="button" onclick="revealValue(this)" class="text-xs font-medium text-brand-muted hover:text-brand-text shrink-0">Reveal</button>
+          <form method="post" action="{{ url_for('projects.delete_env', project_id=project.id, env_id=ev.id) }}"
+                onsubmit="return confirm('Delete variable {{ ev.key }}?');" class="inline">
+            <button type="submit" class="text-xs font-medium text-red-600 hover:text-red-700 shrink-0">Delete</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-xs text-brand-muted mb-4">No variables yet. Add your first below.</p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('projects.add_env', project_id=project.id) }}" class="flex flex-col sm:flex-row gap-2">
+    <input name="key" required placeholder="KEY_NAME"
+           class="sm:w-56 rounded-lg border border-brand-line px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+    <input name="value" required placeholder="value"
+           class="flex-1 rounded-lg border border-brand-line px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
+    <button class="bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium rounded-lg px-4 py-2 transition shadow-sm whitespace-nowrap">
+      Add variable
+    </button>
+  </form>
+  <p class="text-[11px] text-brand-muted mt-2">
+    Key must start with a letter. Letters, digits, <code class="font-mono">_</code> and <code class="font-mono">-</code> allowed. Existing keys are updated.
+  </p>
+</div>
+
 <!-- Danger zone -->
 <div class="mt-10 pt-6 border-t border-brand-line">
   <h2 class="text-sm font-semibold text-red-600">Danger zone</h2>
@@ -158,6 +197,18 @@ function copyModalLogs(event) {
     btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = orig, 1500);
   });
 }
+
+function revealValue(btn) {
+  const code = btn.previousElementSibling;
+  if (code.textContent.trim() === '••••••••') {
+    code.textContent = code.dataset.value;
+    btn.textContent = 'Hide';
+  } else {
+    code.textContent = '••••••••';
+    btn.textContent = 'Reveal';
+  }
+}
+
 function deployProject() {
   const btn = document.getElementById('deployBtn');
   btn.disabled = true; btn.innerHTML = 'Starting...';

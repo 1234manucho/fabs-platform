@@ -9,6 +9,10 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    stripe_customer_id = db.Column(db.String(255), unique=True, index=True)
+    plan = db.Column(db.String(50), default='hobby', nullable=False)
+    subscription_status = db.Column(db.String(50), default='inactive', nullable=False)
     projects = db.relationship(
         'Project', backref='owner', lazy=True, cascade='all, delete-orphan'
     )
@@ -19,6 +23,10 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def is_pro(self):
+        return self.plan == 'pro' and self.subscription_status == 'active'
+
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,12 +36,16 @@ class Project(db.Model):
     branch = db.Column(db.String(100), default='main')
     domain = db.Column(db.String(255), unique=True, nullable=False)
     internal_port = db.Column(db.Integer, default=8000)
-    start_command = db.Column(db.String(255), default='python app.py')
+    start_command = db.Column(db.String(255), default='gunicorn --bind 0.0.0.0:8000 app:app')
     container_name = db.Column(db.String(100))
     status = db.Column(db.String(50), default='created')
+    instance_plan = db.Column(db.String(50), default='starter', nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deployments = db.relationship(
         'Deployment', backref='project', lazy=True, cascade='all, delete-orphan'
+    )
+    env_vars = db.relationship(
+        'EnvVar', backref='project', lazy=True, cascade='all, delete-orphan'
     )
 
 
@@ -45,3 +57,15 @@ class Deployment(db.Model):
     image_tag = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     finished_at = db.Column(db.DateTime)
+
+
+class EnvVar(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    key = db.Column(db.String(255), nullable=False)
+    value = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        db.UniqueConstraint('project_id', 'key', name='uix_project_env_key'),
+    )

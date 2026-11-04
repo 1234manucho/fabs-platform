@@ -29,6 +29,8 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        from app.migrations import run_migrations
+        run_migrations(db)
 
     return app
 

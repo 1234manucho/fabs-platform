@@ -100,11 +100,19 @@ def deploy(project_id, deployment_id):
             except docker.errors.NotFound:
                 pass
 
+            # Collect env vars — DO NOT log values
+            env_dict = {ev.key: ev.value for ev in project.env_vars}
+            if env_dict:
+                _append(deployment_id, f'Injecting {len(env_dict)} environment variable(s)\n')
+            else:
+                _append(deployment_id, 'No environment variables configured\n')
+
             _append(deployment_id, 'Starting new container\n')
             client.containers.run(
                 image_tag,
                 detach=True,
                 name=container_name,
+                environment=env_dict,
                 labels={
                     'traefik.enable': 'true',
                     f'traefik.http.routers.project-{project.id}.rule':
@@ -136,17 +144,11 @@ def deploy(project_id, deployment_id):
 
 
 def delete_docker_resources(project_id, container_name):
-    """
-    Stop & remove the running container and all images for a deleted project.
-    Runs on the worker (which has /var/run/docker.sock mounted).
-    All failures are swallowed — a deleted project shouldn't error the queue.
-    """
     try:
         client = docker.from_env()
     except Exception:
         return
 
-    # 1. Stop + remove the container
     if container_name:
         try:
             c = client.containers.get(container_name)
@@ -163,7 +165,6 @@ def delete_docker_resources(project_id, container_name):
         except Exception:
             pass
 
-    # 2. Remove images tagged deploy-{project_id}:*
     try:
         prefix = f'deploy-{project_id}:'
         for img in client.images.list():

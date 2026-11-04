@@ -4,7 +4,7 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from app import db
-from app.models import Project, Deployment
+from app.models import Project, Deployment, EnvVar
 
 bp = Blueprint('projects', __name__)
 
@@ -70,11 +70,9 @@ def delete(project_id):
     container_name = project.container_name or f'project-{project.id}'
     pid = project.id
 
-    # Delete from DB first (cascades to deployments)
     db.session.delete(project)
     db.session.commit()
 
-    # Enqueue Docker cleanup on the worker
     from app.jobs import delete_docker_resources
     current_app.queue.enqueue(
         delete_docker_resources, pid, container_name, job_timeout=120
@@ -82,6 +80,51 @@ def delete(project_id):
 
     flash(f'Project "{project_name}" deleted.')
     return redirect(url_for('main.dashboard'))
+
+
+@bp.route('/projects/<int:project_id>/env', methods=['POST'])
+@login_required
+def add_env(project_id):
+    project = Project.query.filter_by(
+        id=project_id, user_id=current_user.id
+    ).first_or_404()
+
+    key = request.form.get('key', '').strip()
+    value = request.form.get('value', '')
+
+    if not key or not value:
+        flash('Both key and value are required.')
+        return redirect(url_for('projects.view', project_id=project.id))
+
+    if not key[0].isalpha() or not key.replace('_', '').replace('-', '').isalnum():
+        flash('Key must start with a letter and contain only letters, digits, _ or -.')
+        return redirect(url_for('projects.view', project_id=project.id))
+
+    existing = EnvVar.query.filter_by(project_id=project.id, key=key).first()
+    if existing:
+        existing.value = value
+        db.session.commit()
+        flash(f'Variable {key} updated. Redeploy to apply.')
+    else:
+        db.session.add(EnvVar(project_id=project.id, key=key, value=value))
+        db.session.commit()
+        flash(f'Variable {key} added. Redeploy to apply.')
+
+    return redirect(url_for('projects.view', project_id=project.id))
+
+
+@bp.route('/projects/<int:project_id>/env/<int:env_id>/delete', methods=['POST'])
+@login_required
+def delete_env(project_id, env_id):
+    project = Project.query.filter_by(
+        id=project_id, user_id=current_user.id
+    ).first_or_404()
+    ev = EnvVar.query.filter_by(id=env_id, project_id=project.id).first_or_404()
+    key = ev.key
+    db.session.delete(ev)
+    db.session.commit()
+    flash(f'Variable {key} deleted. Redeploy to apply.')
+    return redirect(url_for('projects.view', project_id=project.id))
 
 
 @bp.route('/deployments/<int:deployment_id>/logs')
