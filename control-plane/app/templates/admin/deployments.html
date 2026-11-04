@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge %}
+{% block title %}Admin · Deployments{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <div class="text-xs uppercase tracking-wider text-brand-red font-semibold">Admin</div>
+    <h1 class="text-2xl font-semibold tracking-tight mt-1">Deployments <span class="text-brand-muted text-lg font-normal">({{ deployments|length }})</span></h1>
+  </div>
+  <a href="{{ url_for('admin.dashboard') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text">← Overview</a>
+</div>
+
+<div class="flex items-center gap-2 mb-6 flex-wrap">
+  <a href="{{ url_for('admin.deployments') }}"
+     class="px-3 py-1.5 rounded-md text-xs font-medium transition {{ 'bg-brand-red text-white' if not status else 'bg-white border border-brand-line text-brand-muted hover:text-brand-text' }}">
+    All
+  </a>
+  <a href="{{ url_for('admin.deployments', status='running') }}"
+     class="px-3 py-1.5 rounded-md text-xs font-medium transition {{ 'bg-brand-red text-white' if status=='running' else 'bg-white border border-brand-line text-brand-muted hover:text-brand-text' }}">
+    Running
+  </a>
+  <a href="{{ url_for('admin.deployments', status='building') }}"
+     class="px-3 py-1.5 rounded-md text-xs font-medium transition {{ 'bg-brand-red text-white' if status=='building' else 'bg-white border border-brand-line text-brand-muted hover:text-brand-text' }}">
+    Building
+  </a>
+  <a href="{{ url_for('admin.deployments', status='queued') }}"
+     class="px-3 py-1.5 rounded-md text-xs font-medium transition {{ 'bg-brand-red text-white' if status=='queued' else 'bg-white border border-brand-line text-brand-muted hover:text-brand-text' }}">
+    Queued
+  </a>
+  <a href="{{ url_for('admin.deployments', status='failed') }}"
+     class="px-3 py-1.5 rounded-md text-xs font-medium transition {{ 'bg-brand-red text-white' if status=='failed' else 'bg-white border border-brand-line text-brand-muted hover:text-brand-text' }}">
+    Failed
+  </a>
+</div>
+
+<div class="overflow-hidden rounded-xl border border-brand-line bg-white">
+  <table class="w-full text-sm">
+    <thead class="bg-brand-surface text-left text-[11px] uppercase tracking-wider text-brand-muted">
+      <tr>
+        <th class="px-4 py-3 font-medium">#</th>
+        <th class="px-4 py-3 font-medium">Project</th>
+        <th class="px-4 py-3 font-medium">Owner</th>
+        <th class="px-4 py-3 font-medium">Status</th>
+        <th class="px-4 py-3 font-medium">Started</th>
+        <th class="px-4 py-3 font-medium">Duration</th>
+        <th class="px-4 py-3 font-medium text-right">Logs</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-brand-line">
+      {% for d in deployments %}
+        <tr class="hover:bg-brand-surface/50">
+          <td class="px-4 py-3 font-mono text-xs">{{ d.id }}</td>
+          <td class="px-4 py-3 font-medium">
+            {{ d.project.name if d.project else '—' }}
+          </td>
+          <td class="px-4 py-3 text-xs text-brand-muted">
+            {{ d.project.owner.email if d.project and d.project.owner else '—' }}
+          </td>
+          <td class="px-4 py-3">{{ status_badge(d.status) }}</td>
+          <td class="px-4 py-3 text-xs text-brand-muted">{{ d.created_at.strftime('%b %d, %H:%M') }}</td>
+          <td class="px-4 py-3 text-xs text-brand-muted">
+            {% if d.finished_at %}
+              {{ ((d.finished_at - d.created_at).total_seconds() // 1)|int }}s
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-right">
+            {% if d.project %}
+              <a href="{{ url_for('projects.view', project_id=d.project.id) }}"
+                 class="text-xs font-medium text-brand-red hover:text-brand-red2">View →</a>
+            {% else %}
+              <span class="text-xs text-brand-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="7" class="px-4 py-10 text-center text-brand-muted">
+            {% if status %}
+              No {{ status }} deployments.
+            {% else %}
+              No deployments yet.
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge %}
+{% block title %}Admin · {{ user.email }}{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <a href="{{ url_for('admin.users') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text">← All users</a>
+</div>
+
+<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight">{{ user.email }}</h1>
+    <div class="flex items-center gap-2 mt-2 flex-wrap">
+      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset {{ 'bg-brand-redSoft text-brand-red3 ring-brand-red/20' if user.plan=='pro' else 'bg-brand-surface2 text-brand-muted ring-brand-line' }}">
+        {{ user.plan|capitalize }} plan
+      </span>
+      <span class="text-xs text-brand-muted">{{ user.subscription_status }}</span>
+      {% if user.is_admin %}
+        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset bg-brand-redSoft text-brand-red3 ring-brand-red/20">Admin</span>
+      {% endif %}
+      <span class="text-xs text-brand-muted">Joined {{ user.created_at.strftime('%b %d, %Y') }}</span>
+    </div>
+  </div>
+  <form method="post" action="{{ url_for('admin.toggle_admin', user_id=user.id) }}">
+    <button class="text-sm font-medium border border-brand-line hover:border-brand-text px-4 py-2 rounded-lg transition">
+      {{ 'Remove admin' if user.is_admin else 'Grant admin' }}
+    </button>
+  </form>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] uppercase tracking-wider text-brand-muted">Projects</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ projects|length }}</div>
+    <div class="text-[11px] text-brand-muted mt-0.5">{{ running_count }} running · {{ failed_count }} failed</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] uppercase tracking-wider text-brand-muted">Deployments</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ deployments_count }}</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] uppercase tracking-wider text-brand-muted">Databases</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ db_count }}</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] uppercase tracking-wider text-brand-muted">Env Vars</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ env_count }}</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] uppercase tracking-wider text-brand-muted">MRR</div>
+    <div class="text-2xl font-semibold mt-1.5">${{ 25 if user.plan=='pro' and user.subscription_status=='active' else 0 }}</div>
+  </div>
+</div>
+
+<div class="bg-white border border-brand-line rounded-xl p-6 mb-8">
+  <h2 class="text-sm font-semibold mb-4">Billing</h2>
+  <dl class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+    <div>
+      <dt class="text-[11px] uppercase tracking-wider text-brand-muted">Stripe customer</dt>
+      <dd class="font-mono text-xs mt-1 truncate">{{ user.stripe_customer_id or '—' }}</dd>
+    </div>
+    <div>
+      <dt class="text-[11px] uppercase tracking-wider text-brand-muted">Subscription status</dt>
+      <dd class="mt-1">{{ user.subscription_status }}</dd>
+    </div>
+    <div>
+      <dt class="text-[11px] uppercase tracking-wider text-brand-muted">Current plan</dt>
+      <dd class="mt-1">{{ user.plan|capitalize }}</dd>
+    </div>
+  </dl>
+</div>
+
+<h2 class="text-sm font-semibold mb-2">Projects ({{ projects|length }})</h2>
+{% if not projects %}
+  <div class="border border-dashed border-brand-line rounded-xl p-10 text-center bg-white mb-6">
+    <p class="text-sm text-brand-muted">No projects yet.</p>
+  </div>
+{% else %}
+  <div class="overflow-hidden rounded-xl border border-brand-line bg-white mb-6">
+    <table class="w-full text-sm">
+      <thead class="bg-brand-surface text-left text-[11px] uppercase tracking-wider text-brand-muted">
+        <tr>
+          <th class="px-4 py-3 font-medium">Name</th>
+          <th class="px-4 py-3 font-medium">Domain</th>
+          <th class="px-4 py-3 font-medium">Status</th>
+          <th class="px-4 py-3 font-medium">Created</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-brand-line">
+        {% for p in projects %}
+          <tr class="hover:bg-brand-surface/50">
+            <td class="px-4 py-3 font-medium">{{ p.name }}</td>
+            <td class="px-4 py-3 font-mono text-xs">{{ p.domain }}</td>
+            <td class="px-4 py-3">{{ status_badge(p.status) }}</td>
+            <td class="px-4 py-3 text-brand-muted text-xs">{{ p.created_at.strftime('%b %d, %Y') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+{% endblock %}

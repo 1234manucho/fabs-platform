@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Admin · Users{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <div class="text-xs uppercase tracking-wider text-brand-red font-semibold">Admin</div>
+    <h1 class="text-2xl font-semibold tracking-tight mt-1">Users <span class="text-brand-muted text-lg font-normal">({{ rows|length }})</span></h1>
+  </div>
+  <a href="{{ url_for('admin.dashboard') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text">← Overview</a>
+</div>
+
+<form method="get" class="flex flex-wrap items-center gap-3 mb-6">
+  <input name="q" value="{{ q }}" placeholder="Search email…"
+         class="flex-1 min-w-64 rounded-lg border border-brand-line px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red">
+  <select name="plan" class="rounded-lg border border-brand-line px-3 py-2 text-sm bg-white">
+    <option value="">All plans</option>
+    <option value="hobby" {% if plan=='hobby' %}selected{% endif %}>Hobby</option>
+    <option value="pro" {% if plan=='pro' %}selected{% endif %}>Pro</option>
+  </select>
+  <select name="status" class="rounded-lg border border-brand-line px-3 py-2 text-sm bg-white">
+    <option value="">All statuses</option>
+    <option value="active" {% if status=='active' %}selected{% endif %}>Active</option>
+    <option value="inactive" {% if status=='inactive' %}selected{% endif %}>Inactive</option>
+    <option value="past_due" {% if status=='past_due' %}selected{% endif %}>Past due</option>
+  </select>
+  <button class="bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium px-4 py-2 rounded-lg transition">Filter</button>
+  {% if q or plan or status %}
+    <a href="{{ url_for('admin.users') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text">Clear</a>
+  {% endif %}
+</form>
+
+<div class="overflow-hidden rounded-xl border border-brand-line bg-white">
+  <table class="w-full text-sm">
+    <thead class="bg-brand-surface text-left text-[11px] uppercase tracking-wider text-brand-muted">
+      <tr>
+        <th class="px-4 py-3 font-medium">Email</th>
+        <th class="px-4 py-3 font-medium">Plan</th>
+        <th class="px-4 py-3 font-medium">Status</th>
+        <th class="px-4 py-3 font-medium text-right">Projects</th>
+        <th class="px-4 py-3 font-medium text-right">Deploys</th>
+        <th class="px-4 py-3 font-medium text-right">DBs</th>
+        <th class="px-4 py-3 font-medium">Admin</th>
+        <th class="px-4 py-3 font-medium">Joined</th>
+        <th class="px-4 py-3 font-medium text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-brand-line">
+      {% for r in rows %}
+        {% set u = r.user %}
+        <tr class="hover:bg-brand-surface/50">
+          <td class="px-4 py-3 font-medium">{{ u.email }}</td>
+          <td class="px-4 py-3">
+            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset {{ 'bg-brand-redSoft text-brand-red3 ring-brand-red/20' if u.plan=='pro' else 'bg-brand-surface2 text-brand-muted ring-brand-line' }}">
+              {{ u.plan|capitalize }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-brand-muted text-xs">{{ u.subscription_status }}</td>
+          <td class="px-4 py-3 text-right font-mono">{{ r.projects }}</td>
+          <td class="px-4 py-3 text-right font-mono">{{ r.deployments }}</td>
+          <td class="px-4 py-3 text-right font-mono">{{ r.databases }}</td>
+          <td class="px-4 py-3">
+            {% if u.is_admin %}
+              <span class="text-brand-red font-semibold text-xs">Yes</span>
+            {% else %}
+              <span class="text-brand-muted text-xs">—</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-brand-muted text-xs">{{ u.created_at.strftime('%b %d, %Y') }}</td>
+          <td class="px-4 py-3 text-right">
+            <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="text-xs font-medium text-brand-red hover:text-brand-red2">View →</a>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="9" class="px-4 py-10 text-center text-brand-muted">
+            {% if q or plan or status %}
+              No users match those filters.
+            {% else %}
+              No users yet.
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

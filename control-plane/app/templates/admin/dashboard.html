@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge %}
+{% block title %}Admin · FABS Deploy{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-8 flex-wrap gap-3">
+  <div>
+    <div class="text-xs uppercase tracking-wider text-brand-red font-semibold">Admin</div>
+    <h1 class="text-2xl font-semibold tracking-tight mt-1">Platform overview</h1>
+    <p class="text-sm text-brand-muted mt-1">Operational view of users, projects, deployments, and revenue.</p>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    <a href="{{ url_for('admin.users') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text px-3 py-2 rounded-md hover:bg-brand-surface transition">Users</a>
+    <a href="{{ url_for('admin.projects') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text px-3 py-2 rounded-md hover:bg-brand-surface transition">Projects</a>
+    <a href="{{ url_for('admin.deployments') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text px-3 py-2 rounded-md hover:bg-brand-surface transition">Deployments</a>
+    <a href="{{ url_for('admin.databases') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text px-3 py-2 rounded-md hover:bg-brand-surface transition">Databases</a>
+    <a href="{{ url_for('admin.billing') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text px-3 py-2 rounded-md hover:bg-brand-surface transition">Billing</a>
+  </div>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+  <div class="bg-brand-text text-white rounded-xl p-5">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-white/60">MRR</div>
+    <div class="text-3xl font-semibold mt-1.5">${{ stats.mrr }}</div>
+    <div class="text-xs text-white/50 mt-1">Monthly recurring revenue</div>
+  </div>
+  <div class="bg-brand-red text-white rounded-xl p-5">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-white/80">Active Pro</div>
+    <div class="text-3xl font-semibold mt-1.5">{{ stats.active_subs }}</div>
+    <div class="text-xs text-white/70 mt-1">Paid subscriptions</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-5">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Free Users</div>
+    <div class="text-3xl font-semibold mt-1.5">{{ stats.free_users }}</div>
+    <div class="text-xs text-brand-muted mt-1">Hobby plan</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-5">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Total Users</div>
+    <div class="text-3xl font-semibold mt-1.5">{{ stats.total_users }}</div>
+    <div class="text-xs text-brand-muted mt-1">All time</div>
+  </div>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Projects</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ stats.total_projects }}</div>
+    <div class="text-[11px] text-emerald-600 mt-0.5">{{ stats.running_projects }} running</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Deployments</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ stats.total_deployments }}</div>
+    <div class="text-[11px] text-brand-muted mt-0.5">{{ stats.deployments_24h }} in last 24h</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Databases</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ stats.total_databases }}</div>
+    <div class="text-[11px] text-emerald-600 mt-0.5">{{ stats.running_databases }} running</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Env Vars</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ stats.total_env_vars }}</div>
+    <div class="text-[11px] text-brand-muted mt-0.5">Across all projects</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Failed</div>
+    <div class="text-2xl font-semibold mt-1.5 text-red-600">{{ stats.failed_projects + stats.failed_deployments }}</div>
+    <div class="text-[11px] text-brand-muted mt-0.5">Needs attention</div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+  <div class="bg-white border border-brand-line rounded-xl overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-brand-line">
+      <h2 class="text-sm font-semibold">Recent signups</h2>
+      <a href="{{ url_for('admin.users') }}" class="text-xs font-medium text-brand-red hover:text-brand-red2">View all →</a>
+    </div>
+    <table class="w-full text-sm">
+      <tbody class="divide-y divide-brand-line">
+        {% for u in recent_users %}
+          <tr class="hover:bg-brand-surface/50">
+            <td class="px-4 py-2.5">
+              <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="font-medium hover:text-brand-red">{{ u.email }}</a>
+            </td>
+            <td class="px-4 py-2.5 text-right text-xs">
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset {{ 'bg-brand-redSoft text-brand-red3 ring-brand-red/20' if u.plan=='pro' else 'bg-brand-surface2 text-brand-muted ring-brand-line' }}">
+                {{ u.plan|capitalize }}
+              </span>
+            </td>
+            <td class="px-4 py-2.5 text-right text-xs text-brand-muted">{{ u.created_at.strftime('%b %d') }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3" class="px-4 py-8 text-center text-brand-muted">No users yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bg-white border border-brand-line rounded-xl overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-brand-line">
+      <h2 class="text-sm font-semibold">Recent deployments</h2>
+      <a href="{{ url_for('admin.deployments') }}" class="text-xs font-medium text-brand-red hover:text-brand-red2">View all →</a>
+    </div>
+    <table class="w-full text-sm">
+      <tbody class="divide-y divide-brand-line">
+        {% for d in recent_deployments %}
+          <tr class="hover:bg-brand-surface/50">
+            <td class="px-4 py-2.5">
+              <div class="font-medium text-xs font-mono">#{{ d.id }}</div>
+              <div class="text-[11px] text-brand-muted truncate">{{ d.project.name if d.project else '—' }}</div>
+            </td>
+            <td class="px-4 py-2.5 text-right">{{ status_badge(d.status) }}</td>
+            <td class="px-4 py-2.5 text-right text-xs text-brand-muted">{{ d.created_at.strftime('%b %d %H:%M') }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3" class="px-4 py-8 text-center text-brand-muted">No deployments yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="bg-white border border-brand-line rounded-xl overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-brand-line">
+      <h2 class="text-sm font-semibold">Recent databases</h2>
+      <a href="{{ url_for('admin.databases') }}" class="text-xs font-medium text-brand-red hover:text-brand-red2">View all →</a>
+    </div>
+    <table class="w-full text-sm">
+      <tbody class="divide-y divide-brand-line">
+        {% for d in recent_databases %}
+          <tr class="hover:bg-brand-surface/50">
+            <td class="px-4 py-2.5">
+              <div class="font-medium text-xs font-mono">{{ d.name }}</div>
+              <div class="text-[11px] text-brand-muted truncate">{{ d.project.name if d.project else '—' }}</div>
+            </td>
+            <td class="px-4 py-2.5 text-right">{{ status_badge(d.status) }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="2" class="px-4 py-8 text-center text-brand-muted">No databases yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bg-white border border-brand-line rounded-xl p-5">
+    <h2 class="text-sm font-semibold mb-4">System health</h2>
+    <div class="space-y-2.5">
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-brand-muted">API server</span>
+        <span class="flex items-center gap-1.5 text-xs font-medium text-emerald-600"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Healthy</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-brand-muted">Database</span>
+        <span class="flex items-center gap-1.5 text-xs font-medium text-emerald-600"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Healthy</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-brand-muted">Job queue</span>
+        <span class="flex items-center gap-1.5 text-xs font-medium text-emerald-600"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Running</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-brand-muted">Reverse proxy</span>
+        <span class="flex items-center gap-1.5 text-xs font-medium text-emerald-600"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Healthy</span>
+      </div>
+      <div class="pt-3 mt-3 border-t border-brand-line flex items-center justify-between">
+        <span class="text-sm font-medium">Failed deployments (24h)</span>
+        <span class="text-sm font-semibold {{ 'text-red-600' if stats.failed_deployments > 0 else 'text-emerald-600' }}">{{ stats.failed_deployments }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge %}
+{% block title %}Admin · Projects{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <div class="text-xs uppercase tracking-wider text-brand-red font-semibold">Admin</div>
+    <h1 class="text-2xl font-semibold tracking-tight mt-1">Projects <span class="text-brand-muted text-lg font-normal">({{ projects|length }})</span></h1>
+  </div>
+  <a href="{{ url_for('admin.dashboard') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text">← Overview</a>
+</div>
+
+<form method="get" class="flex flex-wrap items-center gap-3 mb-6">
+  <input name="q" value="{{ q }}" placeholder="Search project name…"
+         class="flex-1 min-w-64 rounded-lg border border-brand-line px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red">
+  <button class="bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium px-4 py-2 rounded-lg transition">Search</button>
+  {% if q %}
+    <a href="{{ url_for('admin.projects') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text">Clear</a>
+  {% endif %}
+</form>
+
+<div class="overflow-hidden rounded-xl border border-brand-line bg-white">
+  <table class="w-full text-sm">
+    <thead class="bg-brand-surface text-left text-[11px] uppercase tracking-wider text-brand-muted">
+      <tr>
+        <th class="px-4 py-3 font-medium">Name</th>
+        <th class="px-4 py-3 font-medium">Owner</th>
+        <th class="px-4 py-3 font-medium">Domain</th>
+        <th class="px-4 py-3 font-medium">Branch</th>
+        <th class="px-4 py-3 font-medium text-right">Deploys</th>
+        <th class="px-4 py-3 font-medium">Status</th>
+        <th class="px-4 py-3 font-medium">Created</th>
+        <th class="px-4 py-3 font-medium text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-brand-line">
+      {% for p in projects %}
+        <tr class="hover:bg-brand-surface/50">
+          <td class="px-4 py-3 font-medium">{{ p.name }}</td>
+          <td class="px-4 py-3 text-brand-muted text-xs">{{ p.owner.email if p.owner else '—' }}</td>
+          <td class="px-4 py-3 font-mono text-xs">
+            <a href="https://{{ p.domain }}" target="_blank" rel="noopener" class="hover:text-brand-red">{{ p.domain }}</a>
+          </td>
+          <td class="px-4 py-3 font-mono text-xs text-brand-muted">{{ p.branch }}</td>
+          <td class="px-4 py-3 text-right font-mono">{{ p.deployments|length }}</td>
+          <td class="px-4 py-3">{{ status_badge(p.status) }}</td>
+          <td class="px-4 py-3 text-brand-muted text-xs">{{ p.created_at.strftime('%b %d, %Y') }}</td>
+          <td class="px-4 py-3 text-right">
+            <a href="https://platform.fabsdatawarehouse.com/projects/{{ p.id }}" target="_blank" rel="noopener" class="text-xs font-medium text-brand-red hover:text-brand-red2">View →</a>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="8" class="px-4 py-10 text-center text-brand-muted">
+            {% if q %}No projects match "{{ q }}".{% else %}No projects yet.{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

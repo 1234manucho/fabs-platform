@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Admin · Billing{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <div class="text-xs uppercase tracking-wider text-brand-red font-semibold">Admin</div>
+    <h1 class="text-2xl font-semibold tracking-tight mt-1">Billing</h1>
+    <p class="text-sm text-brand-muted mt-1">Revenue metrics and subscription management.</p>
+  </div>
+  <a href="{{ url_for('admin.dashboard') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text">← Overview</a>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+  <div class="bg-brand-text text-white rounded-xl p-5">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-white/60">MRR</div>
+    <div class="text-3xl font-semibold mt-1.5">${{ stats.mrr }}</div>
+    <div class="text-xs text-white/50 mt-1">Monthly recurring</div>
+  </div>
+  <div class="bg-brand-red text-white rounded-xl p-5">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-white/80">ARR</div>
+    <div class="text-3xl font-semibold mt-1.5">${{ stats.arr }}</div>
+    <div class="text-xs text-white/70 mt-1">Annualized</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-5">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Active Pro</div>
+    <div class="text-3xl font-semibold mt-1.5">{{ stats.active_pro }}</div>
+    <div class="text-xs text-brand-muted mt-1">Paid subscriptions</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-5">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Past Due</div>
+    <div class="text-3xl font-semibold mt-1.5 {{ 'text-red-600' if stats.past_due > 0 else '' }}">{{ stats.past_due }}</div>
+    <div class="text-xs text-brand-muted mt-1">Needs attention</div>
+  </div>
+</div>
+
+<div class="bg-white border border-brand-line rounded-xl p-6 mb-8">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div class="min-w-0">
+      <h2 class="text-sm font-semibold">Stripe is not connected yet</h2>
+      <p class="text-sm text-brand-muted mt-1 max-w-lg">
+        Billing is provisioned in the schema but Stripe is not wired up.
+        Once connected, this page shows real MRR, invoices, refunds, and the full payment timeline.
+      </p>
+    </div>
+    <a href="#" class="text-sm font-medium text-brand-red hover:text-brand-red2 whitespace-nowrap">Connect Stripe →</a>
+  </div>
+
+  <div class="mt-4 pt-4 border-t border-brand-line grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div>
+      <div class="text-[11px] uppercase tracking-wider text-brand-muted">New subs (30d)</div>
+      <div class="text-lg font-semibold mt-1">{{ stats.new_subs_30d }}</div>
+    </div>
+    <div>
+      <div class="text-[11px] uppercase tracking-wider text-brand-muted">Churn (30d)</div>
+      <div class="text-lg font-semibold mt-1">—</div>
+    </div>
+    <div>
+      <div class="text-[11px] uppercase tracking-wider text-brand-muted">Avg revenue / user</div>
+      <div class="text-lg font-semibold mt-1">${{ ((stats.mrr / stats.active_pro)|round(2)) if stats.active_pro > 0 else 0 }}</div>
+    </div>
+    <div>
+      <div class="text-[11px] uppercase tracking-wider text-brand-muted">Conversion rate</div>
+      <div class="text-lg font-semibold mt-1">—</div>
+    </div>
+  </div>
+</div>
+
+<h2 class="text-sm font-semibold mb-2">Active Pro subscribers ({{ active_pro|length }})</h2>
+<div class="overflow-hidden rounded-xl border border-brand-line bg-white mb-6">
+  <table class="w-full text-sm">
+    <thead class="bg-brand-surface text-left text-[11px] uppercase tracking-wider text-brand-muted">
+      <tr>
+        <th class="px-4 py-3 font-medium">Email</th>
+        <th class="px-4 py-3 font-medium">Plan</th>
+        <th class="px-4 py-3 font-medium">Status</th>
+        <th class="px-4 py-3 font-medium">Stripe customer</th>
+        <th class="px-4 py-3 font-medium text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-brand-line">
+      {% for u in active_pro %}
+        <tr class="hover:bg-brand-surface/50">
+          <td class="px-4 py-3 font-medium">
+            <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="hover:text-brand-red">{{ u.email }}</a>
+          </td>
+          <td class="px-4 py-3">{{ u.plan|capitalize }}</td>
+          <td class="px-4 py-3 text-xs text-brand-muted">{{ u.subscription_status }}</td>
+          <td class="px-4 py-3 font-mono text-xs text-brand-muted truncate">{{ u.stripe_customer_id or '—' }}</td>
+          <td class="px-4 py-3 text-right">
+            <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="text-xs font-medium text-brand-red hover:text-brand-red2">View →</a>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="5" class="px-4 py-10 text-center text-brand-muted">
+            No active subscriptions yet.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if past_due %}
+  <h2 class="text-sm font-semibold mb-2 text-red-600">Past due ({{ past_due|length }})</h2>
+  <div class="overflow-hidden rounded-xl border border-red-200 bg-white">
+    <table class="w-full text-sm">
+      <tbody class="divide-y divide-red-100">
+        {% for u in past_due %}
+          <tr class="hover:bg-red-50">
+            <td class="px-4 py-3 font-medium">
+              <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="hover:text-brand-red">{{ u.email }}</a>
+            </td>
+            <td class="px-4 py-3 text-xs text-brand-muted">Subscription: {{ u.plan|capitalize }}</td>
+            <td class="px-4 py-3 text-right text-xs text-red-600 font-medium">Past due</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+{% endblock %}
