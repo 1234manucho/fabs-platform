@@ -1,5 +1,4 @@
+.env
+*.bak
+*.chunks
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.pytest_cache/
