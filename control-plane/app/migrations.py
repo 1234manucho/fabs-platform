@@ -2,18 +2,22 @@ from sqlalchemy import text
 
 
 MIGRATIONS = [
-    # ---- User: admin/billing ----
+    # ---- User: admin ----
     'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE',
-    'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255)',
+
+    # ---- User: billing ----
     'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS plan VARCHAR(50) NOT NULL DEFAULT \'hobby\'',
     'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(50) NOT NULL DEFAULT \'inactive\'',
-    'CREATE UNIQUE INDEX IF NOT EXISTS idx_user_stripe_customer ON "user" (stripe_customer_id) WHERE stripe_customer_id IS NOT NULL',
 
     # ---- User: profile ----
     'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS name VARCHAR(100)',
     'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS phone VARCHAR(30)',
     'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS country VARCHAR(2)',
     'ALTER TABLE "user" ADD COLUMN IF NOT EXISTS signup_ip VARCHAR(45)',
+
+    # ---- Drop legacy Stripe column (migrating to M-Pesa/DPO) ----
+    'DROP INDEX IF EXISTS idx_user_stripe_customer',
+    'ALTER TABLE "user" DROP COLUMN IF EXISTS stripe_customer_id',
 
     # ---- Project: instance plan ----
     'ALTER TABLE project ADD COLUMN IF NOT EXISTS instance_plan VARCHAR(50) NOT NULL DEFAULT \'starter\'',

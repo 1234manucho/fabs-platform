@@ -11,8 +11,8 @@
   <div>
     <h1 class="text-2xl font-semibold tracking-tight">{{ user.email }}</h1>
     <div class="flex items-center gap-2 mt-2 flex-wrap">
-      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset {{ 'bg-brand-redSoft text-brand-red3 ring-brand-red/20' if user.plan=='pro' else 'bg-brand-surface2 text-brand-muted ring-brand-line' }}">
-        {{ user.plan|capitalize }} plan
+      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset {{ 'bg-brand-redSoft text-brand-red3 ring-brand-red/20' if user.plan!='hobby' else 'bg-brand-surface2 text-brand-muted ring-brand-line' }}">
+        {{ user.plan.replace('_', ' ').title() }}
       </span>
       <span class="text-xs text-brand-muted">{{ user.subscription_status }}</span>
       {% if user.is_admin %}
@@ -20,6 +20,13 @@
       {% endif %}
       <span class="text-xs text-brand-muted">Joined {{ user.created_at.strftime('%b %d, %Y') }}</span>
     </div>
+    {% if user.name or user.phone or user.country %}
+      <div class="text-sm text-brand-muted mt-2">
+        {% if user.name %}{{ user.name }}{% endif %}
+        {% if user.phone %} · <span class="font-mono text-xs">{{ user.phone }}</span>{% endif %}
+        {% if user.country %} · {{ user.country }}{% endif %}
+      </div>
+    {% endif %}
   </div>
   <form method="post" action="{{ url_for('admin.toggle_admin', user_id=user.id) }}">
     <button class="text-sm font-medium border border-brand-line hover:border-brand-text px-4 py-2 rounded-lg transition">
@@ -48,24 +55,43 @@
   </div>
   <div class="bg-white border border-brand-line rounded-xl p-4">
     <div class="text-[11px] uppercase tracking-wider text-brand-muted">MRR</div>
-    <div class="text-2xl font-semibold mt-1.5">${{ 25 if user.plan=='pro' and user.subscription_status=='active' else 0 }}</div>
+    <div class="text-2xl font-semibold mt-1.5">${{ 25 if user.is_paid else 0 }}</div>
   </div>
 </div>
 
 <div class="bg-white border border-brand-line rounded-xl p-6 mb-8">
-  <h2 class="text-sm font-semibold mb-4">Billing</h2>
+  <h2 class="text-sm font-semibold mb-4">Subscription</h2>
   <dl class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
     <div>
-      <dt class="text-[11px] uppercase tracking-wider text-brand-muted">Stripe customer</dt>
-      <dd class="font-mono text-xs mt-1 truncate">{{ user.stripe_customer_id or '—' }}</dd>
+      <dt class="text-[11px] uppercase tracking-wider text-brand-muted">Current plan</dt>
+      <dd class="mt-1 font-medium">{{ user.plan.replace('_', ' ').title() }}</dd>
     </div>
     <div>
       <dt class="text-[11px] uppercase tracking-wider text-brand-muted">Subscription status</dt>
-      <dd class="mt-1">{{ user.subscription_status }}</dd>
+      <dd class="mt-1">
+        {% if user.subscription_status == 'active' %}
+          <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Active
+          </span>
+        {% elif user.subscription_status == 'pending_payment' %}
+          <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 pulse-dot"></span>
+            Pending payment
+          </span>
+        {% else %}
+          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-brand-surface2 text-brand-muted ring-1 ring-inset ring-brand-line">
+            {{ user.subscription_status }}
+          </span>
+        {% endif %}
+      </dd>
     </div>
     <div>
-      <dt class="text-[11px] uppercase tracking-wider text-brand-muted">Current plan</dt>
-      <dd class="mt-1">{{ user.plan|capitalize }}</dd>
+      <dt class="text-[11px] uppercase tracking-wider text-brand-muted">Payment history</dt>
+      <dd class="mt-1">
+        {% set successful_payments = user.payments|selectattr('status', 'equalto', 'success')|list|length if user.payments else 0 %}
+        {{ successful_payments }} successful
+      </dd>
     </div>
   </dl>
 </div>

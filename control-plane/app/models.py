@@ -18,7 +18,6 @@ class User(UserMixin, db.Model):
 
     # Roles & billing
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
-    stripe_customer_id = db.Column(db.String(255), unique=True, index=True)
     plan = db.Column(db.String(50), default='hobby', nullable=False)
     subscription_status = db.Column(db.String(50), default='inactive', nullable=False)
 
@@ -41,7 +40,6 @@ class User(UserMixin, db.Model):
 
     @property
     def is_pro(self):
-        # Backwards-compatible alias for old code
         return self.is_paid
 
 
@@ -133,9 +131,9 @@ class Payment(db.Model):
     amount_usd = db.Column(db.Numeric(10, 2), nullable=False)
     amount_local = db.Column(db.Numeric(10, 2))
     currency = db.Column(db.String(10), default='USD')
-    provider = db.Column(db.String(20), nullable=False)  # 'mpesa' or 'dpo'
-    provider_ref = db.Column(db.String(255), index=True)  # CheckoutRequestID (M-Pesa) or TransToken (DPO)
-    status = db.Column(db.String(50), default='pending')  # pending, success, failed
+    provider = db.Column(db.String(20), nullable=False)
+    provider_ref = db.Column(db.String(255), index=True)
+    status = db.Column(db.String(50), default='pending')
     raw_response = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     finished_at = db.Column(db.DateTime)

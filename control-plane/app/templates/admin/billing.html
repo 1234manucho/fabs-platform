@@ -23,7 +23,7 @@
     <div class="text-xs text-white/70 mt-1">Annualized</div>
   </div>
   <div class="bg-white border border-brand-line rounded-xl p-5">
-    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Active Pro</div>
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Active Paid</div>
     <div class="text-3xl font-semibold mt-1.5">{{ stats.active_pro }}</div>
     <div class="text-xs text-brand-muted mt-1">Paid subscriptions</div>
   </div>
@@ -34,18 +34,33 @@
   </div>
 </div>
 
+<!-- Payment providers -->
 <div class="bg-white border border-brand-line rounded-xl p-6 mb-8">
-  <div class="flex items-start justify-between gap-4 flex-wrap">
-    <div class="min-w-0">
-      <h2 class="text-sm font-semibold">Stripe is not connected yet</h2>
-      <p class="text-sm text-brand-muted mt-1 max-w-lg">
-        Billing is provisioned in the schema but Stripe is not wired up.
-        Once connected, this page shows real MRR, invoices, refunds, and the full payment timeline.
-      </p>
+  <h2 class="text-sm font-semibold mb-4">Payment providers</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="border border-brand-line rounded-lg p-4 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-xl shrink-0">📱</div>
+      <div class="flex-1">
+        <div class="font-medium text-sm">M-Pesa</div>
+        <div class="text-xs text-brand-muted">Safaricom Daraja</div>
+      </div>
+      <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        Live
+      </span>
     </div>
-    <a href="#" class="text-sm font-medium text-brand-red hover:text-brand-red2 whitespace-nowrap">Connect Stripe →</a>
+    <div class="border border-brand-line rounded-lg p-4 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-xl shrink-0">💳</div>
+      <div class="flex-1">
+        <div class="font-medium text-sm">DPO Pay</div>
+        <div class="text-xs text-brand-muted">Card payments</div>
+      </div>
+      <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        Live
+      </span>
+    </div>
   </div>
-
   <div class="mt-4 pt-4 border-t border-brand-line grid grid-cols-2 md:grid-cols-4 gap-4">
     <div>
       <div class="text-[11px] uppercase tracking-wider text-brand-muted">New subs (30d)</div>
@@ -66,7 +81,7 @@
   </div>
 </div>
 
-<h2 class="text-sm font-semibold mb-2">Active Pro subscribers ({{ active_pro|length }})</h2>
+<h2 class="text-sm font-semibold mb-2">Active paid subscribers ({{ active_pro|length }})</h2>
 <div class="overflow-hidden rounded-xl border border-brand-line bg-white mb-6">
   <table class="w-full text-sm">
     <thead class="bg-brand-surface text-left text-[11px] uppercase tracking-wider text-brand-muted">
@@ -74,7 +89,6 @@
         <th class="px-4 py-3 font-medium">Email</th>
         <th class="px-4 py-3 font-medium">Plan</th>
         <th class="px-4 py-3 font-medium">Status</th>
-        <th class="px-4 py-3 font-medium">Stripe customer</th>
         <th class="px-4 py-3 font-medium text-right">Actions</th>
       </tr>
     </thead>
@@ -84,16 +98,15 @@
           <td class="px-4 py-3 font-medium">
             <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="hover:text-brand-red">{{ u.email }}</a>
           </td>
-          <td class="px-4 py-3">{{ u.plan|capitalize }}</td>
+          <td class="px-4 py-3">{{ u.plan.replace('_', ' ').title() }}</td>
           <td class="px-4 py-3 text-xs text-brand-muted">{{ u.subscription_status }}</td>
-          <td class="px-4 py-3 font-mono text-xs text-brand-muted truncate">{{ u.stripe_customer_id or '—' }}</td>
           <td class="px-4 py-3 text-right">
             <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="text-xs font-medium text-brand-red hover:text-brand-red2">View →</a>
           </td>
         </tr>
       {% else %}
         <tr>
-          <td colspan="5" class="px-4 py-10 text-center text-brand-muted">
+          <td colspan="4" class="px-4 py-10 text-center text-brand-muted">
             No active subscriptions yet.
           </td>
         </tr>
@@ -112,7 +125,7 @@
             <td class="px-4 py-3 font-medium">
               <a href="{{ url_for('admin.user_detail', user_id=u.id) }}" class="hover:text-brand-red">{{ u.email }}</a>
             </td>
-            <td class="px-4 py-3 text-xs text-brand-muted">Subscription: {{ u.plan|capitalize }}</td>
+            <td class="px-4 py-3 text-xs text-brand-muted">Plan: {{ u.plan.replace('_', ' ').title() }}</td>
             <td class="px-4 py-3 text-right text-xs text-red-600 font-medium">Past due</td>
           </tr>
         {% endfor %}

@@ -78,14 +78,13 @@ def register():
         db.session.commit()
         login_user(user)
 
+        # 6. Route them to the right place
         if plan_tier in PAID_TIERS:
-            flash(
-                f'Welcome! Your {PLANS[plan_tier]["name"]} plan is pending payment. '
-                f'Complete payment to unlock premium features.'
-            )
-        else:
-            flash('Account created. Welcome to FABS Deploy!')
+            plan_name = PLANS[plan_tier]['name']
+            flash(f'Welcome! Complete your payment to activate your {plan_name} plan.')
+            return redirect(url_for('billing.pay', tier=plan_tier))
 
+        flash('Account created. Welcome to FABS Deploy!')
         return redirect(url_for('main.dashboard'))
 
     return render_template('register.html', plans=PLANS)
@@ -99,6 +98,10 @@ def login():
         ).first()
         if user and user.check_password(request.form['password']):
             login_user(user)
+            # If they have a paid plan but haven't paid, take them straight to checkout
+            if user.plan in PAID_TIERS and user.subscription_status != 'active':
+                flash(f'Welcome back. Complete your {PLANS[user.plan]["name"]} payment to unlock all features.')
+                return redirect(url_for('billing.pay', tier=user.plan))
             return redirect(url_for('main.dashboard'))
         flash('Invalid credentials')
     return render_template('login.html')

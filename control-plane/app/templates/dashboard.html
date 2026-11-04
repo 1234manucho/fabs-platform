@@ -1,34 +1,80 @@
 {% extends 'base.html' %}
 {% from '_macros.html' import status_badge %}
 {% block title %}Projects · FABS Deploy{% endblock %}
+
 {% block content %}
+
+{# ── Payment banner — only shown for unpaid paid-plan users ── #}
+{% if current_user.plan != 'hobby' and current_user.subscription_status != 'active' %}
+<div class="mb-6 bg-brand-redSoft border-2 border-brand-red rounded-2xl p-5">
+  <div class="flex items-start gap-4 flex-wrap sm:flex-nowrap">
+    <div class="w-12 h-12 rounded-full bg-brand-red flex items-center justify-center text-white text-2xl shrink-0">!</div>
+    <div class="flex-1 min-w-0">
+      <h2 class="font-semibold text-brand-red3 text-lg">
+        Your {{ current_user.plan.replace('_', ' ').title() }} plan is pending payment
+      </h2>
+      <p class="text-sm text-brand-red3/80 mt-1">
+        Complete your payment to unlock deployments, databases, and all premium features.
+      </p>
+    </div>
+    <a href="{{ url_for('billing.pay', tier=current_user.plan) }}"
+       class="bg-brand-red hover:bg-brand-red2 text-white font-medium px-5 py-2.5 rounded-lg shadow-sm whitespace-nowrap">
+      Complete payment →
+    </a>
+  </div>
+</div>
+{% endif %}
+
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
   <div>
     <h1 class="text-2xl font-semibold tracking-tight">Projects</h1>
     <p class="text-sm text-brand-muted mt-1">Deploy and manage your applications from GitHub.</p>
   </div>
-  <a href="{{ url_for('projects.new') }}" class="inline-flex items-center justify-center gap-2 bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition shadow-sm">
-    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-    New project
-  </a>
+  <div class="flex items-center gap-2">
+    <a href="{{ url_for('billing.history') }}" class="text-sm font-medium text-brand-muted hover:text-brand-text px-3 py-2 rounded-md hover:bg-brand-surface transition">Billing</a>
+    <a href="{{ url_for('projects.new') }}"
+       class="inline-flex items-center justify-center gap-2 bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition shadow-sm">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
+      New project
+    </a>
+  </div>
 </div>
 
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-  <div class="bg-white border border-brand-line rounded-xl p-4"><div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Total projects</div><div class="text-2xl font-semibold mt-1.5">{{ stats.total }}</div></div>
-  <div class="bg-white border border-brand-line rounded-xl p-4"><div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Running</div><div class="text-2xl font-semibold mt-1.5 text-emerald-600">{{ stats.running }}</div></div>
-  <div class="bg-white border border-brand-line rounded-xl p-4"><div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Failed</div><div class="text-2xl font-semibold mt-1.5 text-red-600">{{ stats.failed }}</div></div>
-  <div class="bg-white border border-brand-line rounded-xl p-4"><div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Deployments</div><div class="text-2xl font-semibold mt-1.5">{{ stats.deployments }}</div></div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Total projects</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ stats.total }}</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Running</div>
+    <div class="text-2xl font-semibold mt-1.5 text-emerald-600">{{ stats.running }}</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Failed</div>
+    <div class="text-2xl font-semibold mt-1.5 text-red-600">{{ stats.failed }}</div>
+  </div>
+  <div class="bg-white border border-brand-line rounded-xl p-4">
+    <div class="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Deployments</div>
+    <div class="text-2xl font-semibold mt-1.5">{{ stats.deployments }}</div>
+  </div>
 </div>
 
 {% if not projects %}
   <div class="border border-dashed border-brand-line rounded-2xl p-12 text-center bg-white">
     <div class="w-12 h-12 rounded-xl bg-brand-surface2 flex items-center justify-center mx-auto text-brand-muted">
-      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+      </svg>
     </div>
     <h2 class="text-base font-semibold mt-4">No projects yet</h2>
     <p class="text-sm text-brand-muted mt-1 max-w-sm mx-auto">Connect a GitHub repository to build, deploy and host your first application.</p>
-    <a href="{{ url_for('projects.new') }}" class="inline-flex items-center gap-2 mt-5 bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition shadow-sm">
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+    <a href="{{ url_for('projects.new') }}"
+       class="inline-flex items-center gap-2 mt-5 bg-brand-red hover:bg-brand-red2 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition shadow-sm">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
       Create your first project
     </a>
   </div>
@@ -36,7 +82,8 @@
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
     {% for p in projects %}
       {% set last = p.deployments|sort(attribute='created_at', reverse=True)|first %}
-      <a href="{{ url_for('projects.view', project_id=p.id) }}" class="group bg-white border border-brand-line rounded-2xl p-5 hover:border-brand-red/40 hover:shadow-md transition flex flex-col">
+      <a href="{{ url_for('projects.view', project_id=p.id) }}"
+         class="group bg-white border border-brand-line rounded-2xl p-5 hover:border-brand-red/40 hover:shadow-md transition flex flex-col">
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
             <h3 class="font-semibold text-brand-text truncate group-hover:text-brand-red transition">{{ p.name }}</h3>
@@ -46,11 +93,17 @@
         </div>
         <div class="mt-4 pt-4 border-t border-brand-line flex items-center justify-between text-[11px] text-brand-muted">
           <span class="inline-flex items-center gap-1.5 font-mono">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3v12m0 0a3 3 0 103 3M6 15a3 3 0 003 3m0 0h9m-9 0v-6m9 6a3 3 0 100-6 3 3 0 000 6z"/></svg>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 3v12m0 0a3 3 0 103 3M6 15a3 3 0 003 3m0 0h9m-9 0v-6m9 6a3 3 0 100-6 3 3 0 000 6z"/>
+            </svg>
             {{ p.branch }}
           </span>
           <span>{{ p.deployments|length }} deploy{{ '' if p.deployments|length == 1 else 's' }}</span>
-          {% if last %}<span>{{ last.created_at.strftime('%b %d') }}</span>{% else %}<span class="text-brand-muted2">Never deployed</span>{% endif %}
+          {% if last %}
+            <span>{{ last.created_at.strftime('%b %d') }}</span>
+          {% else %}
+            <span class="text-brand-muted2">Never deployed</span>
+          {% endif %}
         </div>
       </a>
     {% endfor %}
