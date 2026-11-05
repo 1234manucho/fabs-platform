@@ -5,7 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#ED3138">
   <meta name="color-scheme" content="light">
+
+  <!-- Primary meta -->
   <title>FABS Deploy · Your fastest path to production</title>
+  <meta name="description" content="Deploy Flask, Node, or Docker apps in under 60 seconds. Automatic SSL, managed PostgreSQL, live logs — on infrastructure you control. Built in Kenya for builders across Africa.">
+  <meta name="author" content="FABS Trading">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="FABS Deploy · Your fastest path to production">
+  <meta property="og:description" content="Deploy Flask, Node, or Docker apps in under 60 seconds. Automatic SSL, managed PostgreSQL, live logs — on infrastructure you control.">
+  <meta property="og:url" content="https://platform.fabsdatawarehouse.com">
+  <meta property="og:site_name" content="FABS Deploy">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FABS Deploy · Your fastest path to production">
+  <meta name="twitter:description" content="Deploy Flask, Node, or Docker apps in under 60 seconds.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ED3138'/><text x='50' y='72' font-size='70' font-weight='900' fill='white' text-anchor='middle' font-family='system-ui'>F</text></svg>">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "FABS Deploy",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "description": "Deploy Flask, Node, or Docker apps in under 60 seconds. Automatic SSL, managed PostgreSQL, live logs.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +80,6 @@
     html { scroll-behavior: smooth; }
     .sharp-corner { border-radius: 0; }
 
-    /* ─── Animated gradient mesh (hero background) ─── */
     @keyframes meshShift {
       0%, 100% { background-position: 0% 50%; }
       50%      { background-position: 100% 50%; }
@@ -58,7 +93,6 @@
       animation: meshShift 20s ease-in-out infinite;
     }
 
-    /* ─── Floating language logos ─── */
     @keyframes float {
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50%      { transform: translateY(-20px) rotate(2deg); }
@@ -73,14 +107,12 @@
     .float-4 { animation: floatSlow 9s ease-in-out infinite 0.5s; }
     .float-5 { animation: float 5s ease-in-out infinite 3s; }
 
-    /* ─── Rotating glow orbs ─── */
     @keyframes spin-slow {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
     .spin-slow { animation: spin-slow 40s linear infinite; }
 
-    /* ─── Marquee scroll ─── */
     @keyframes marquee {
       0%   { transform: translateX(0); }
       100% { transform: translateX(-50%); }
@@ -94,7 +126,6 @@
       animation-play-state: paused;
     }
 
-    /* ─── Fade-in-up on scroll ─── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(30px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -110,7 +141,6 @@
     .reveal-d5.in-view { animation-delay: 0.5s; }
     .reveal-d6.in-view { animation-delay: 0.6s; }
 
-    /* ─── Blinking cursor (terminal + hero typewriter) ─── */
     @keyframes blink {
       0%, 49%   { opacity: 1; }
       50%, 100% { opacity: 0; }
@@ -122,32 +152,25 @@
       animation: blink 1s step-end infinite;
     }
 
-    /* ─── Card hover lift ─── */
     .lift { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease; }
     .lift:hover { transform: translateY(-6px); box-shadow: 0 20px 60px -15px rgba(18,24,32,.15); border-color: rgba(237,49,56,.3); }
 
-    /* ─── Logo tile hover ─── */
     .logo-tile { transition: all 0.3s ease; }
     .logo-tile:hover { transform: scale(1.1) translateY(-2px); filter: grayscale(0%); }
     .logo-tile { filter: grayscale(30%); }
 
-    /* ─── Gradient border on Pro pricing ─── */
     @keyframes gradientBorder {
       0%, 100% { box-shadow: 0 0 0 2px rgba(237,49,56,.5), 0 20px 60px -15px rgba(237,49,56,.3); }
       50%      { box-shadow: 0 0 0 2px rgba(237,49,56,.8), 0 20px 60px -15px rgba(237,49,56,.5); }
     }
-    .gradient-glow {
-      animation: gradientBorder 3s ease-in-out infinite;
-    }
+    .gradient-glow { animation: gradientBorder 3s ease-in-out infinite; }
 
-    /* ─── Pulse dot ─── */
     @keyframes pulseDot {
       0%, 100% { opacity: 1; transform: scale(1); }
       50%      { opacity: 0.4; transform: scale(1.2); }
     }
     .pulse-dot { animation: pulseDot 1.4s ease-in-out infinite; }
 
-    /* ─── Button shimmer ─── */
     @keyframes shimmer {
       0%   { background-position: -200% 0; }
       100% { background-position: 200% 0; }
@@ -158,10 +181,14 @@
       animation: shimmer 4s ease-in-out infinite;
     }
 
-    /* ─── Stats counter ─── */
     .counter { font-variant-numeric: tabular-nums; }
 
-    /* ─── Reduced motion support ─── */
+    /* FAQ */
+    details.faq > summary { list-style: none; cursor: pointer; }
+    details.faq > summary::-webkit-details-marker { display: none; }
+    details.faq[open] .faq-icon { transform: rotate(45deg); }
+    .faq-icon { transition: transform 0.2s ease; }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -188,7 +215,7 @@
 
   <!-- ============ ANNOUNCEMENT ============ -->
   <div class="bg-brand-text text-white text-xs relative overflow-hidden">
-    <div class="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-center gap-2">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-center gap-2 flex-wrap">
       <span class="w-1.5 h-1.5 rounded-full bg-brand-red pulse-dot"></span>
       <span>Launch offer: Free hosting for your first 3 projects.</span>
       <a href="{{ url_for('auth.register') }}" class="underline font-medium hover:no-underline">Get started →</a>
@@ -199,7 +226,7 @@
   <header id="site-header" class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-transparent transition-all duration-300">
     <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-10">
-        <a href="{{ url_for('main.home') }}" class="flex items-center gap-2.5 group">
+        <a href="{{ url_for('main.home') }}" class="flex items-center gap-2.5 group" aria-label="FABS Deploy home">
           <div class="w-8 h-8 bg-brand-red flex items-center justify-center text-white text-sm font-black shadow-redSm group-hover:scale-110 transition-transform duration-300">F</div>
           <div class="leading-tight">
             <div class="font-semibold text-brand-text">FABS <span class="text-brand-red">DEPLOY</span></div>
@@ -208,9 +235,9 @@
         </a>
         <div class="hidden lg:flex items-center gap-7 text-sm font-medium text-brand-muted">
           <a href="#features" class="hover:text-brand-text transition">Features</a>
-          <a href="#stack" class="hover:text-brand-text transition">Stack</a>
+          <a href="#how" class="hover:text-brand-text transition">How it works</a>
           <a href="#pricing" class="hover:text-brand-text transition">Pricing</a>
-          <a href="{{ url_for('public.docs') }}" class="hover:text-brand-text transition">Docs</a>
+          <a href="#faq" class="hover:text-brand-text transition">FAQ</a>
         </div>
       </div>
       <div class="flex items-center gap-3">
@@ -226,41 +253,37 @@
 
   <!-- ============ HERO ============ -->
   <section class="relative mesh-bg overflow-hidden">
-    <!-- Rotating glow orbs -->
     <div class="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-brand-red/5 blur-3xl spin-slow pointer-events-none"></div>
     <div class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-brand-red/8 blur-3xl spin-slow pointer-events-none" style="animation-direction: reverse;"></div>
 
-    <!-- Floating language logos (positioned absolutely around hero) -->
     <div class="hidden lg:block absolute inset-0 pointer-events-none">
       <div class="absolute top-[15%] left-[8%] float-1 opacity-70">
-        <img src="https://cdn.simpleicons.org/python/3776AB" alt="Python" class="w-12 h-12 drop-shadow-lg">
+        <img src="https://cdn.simpleicons.org/python/3776AB" alt="" class="w-12 h-12 drop-shadow-lg">
       </div>
       <div class="absolute top-[25%] right-[10%] float-2 opacity-70">
-        <img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" alt="Node.js" class="w-14 h-14 drop-shadow-lg">
+        <img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" alt="" class="w-14 h-14 drop-shadow-lg">
       </div>
       <div class="absolute bottom-[20%] left-[12%] float-3 opacity-70">
-        <img src="https://cdn.simpleicons.org/docker/2496ED" alt="Docker" class="w-16 h-16 drop-shadow-lg">
+        <img src="https://cdn.simpleicons.org/docker/2496ED" alt="" class="w-16 h-16 drop-shadow-lg">
       </div>
       <div class="absolute bottom-[30%] right-[8%] float-4 opacity-70">
-        <img src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL" class="w-14 h-14 drop-shadow-lg">
+        <img src="https://cdn.simpleicons.org/postgresql/4169E1" alt="" class="w-14 h-14 drop-shadow-lg">
       </div>
       <div class="absolute top-[60%] left-[3%] float-5 opacity-50">
-        <img src="https://cdn.simpleicons.org/redis/DC382D" alt="Redis" class="w-10 h-10 drop-shadow-lg">
+        <img src="https://cdn.simpleicons.org/redis/DC382D" alt="" class="w-10 h-10 drop-shadow-lg">
       </div>
       <div class="absolute top-[8%] right-[25%] float-3 opacity-40">
-        <img src="https://cdn.simpleicons.org/traefikproxy/24A1C1" alt="Traefik" class="w-9 h-9 drop-shadow-lg">
+        <img src="https://cdn.simpleicons.org/traefikproxy/24A1C1" alt="" class="w-9 h-9 drop-shadow-lg">
       </div>
     </div>
 
     <div class="relative max-w-7xl mx-auto px-6 pt-20 md:pt-28 pb-24 md:pb-32">
       <div class="text-center">
-        <!-- Badge -->
         <div class="reveal inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-brand-red/20 shadow-soft text-xs font-medium mb-8">
           <span class="w-1.5 h-1.5 rounded-full bg-brand-red pulse-dot"></span>
           <span class="text-brand-red3">Built in Kenya · Serving builders across Africa</span>
         </div>
 
-        <!-- Headline with typewriter -->
         <h1 class="reveal reveal-d1 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-[-0.04em] leading-[0.92] max-w-5xl mx-auto">
           Your fastest path to
           <br>
@@ -271,7 +294,6 @@
           Deploy Flask, Node, or Docker apps in under 60 seconds. Automatic SSL, managed PostgreSQL, live logs — on infrastructure you control.
         </p>
 
-        <!-- CTAs -->
         <div class="reveal reveal-d3 mt-10 flex flex-col sm:flex-row gap-3 justify-center items-center">
           <a href="{{ url_for('auth.register') }}" class="btn-shimmer text-white text-[15px] font-medium px-8 py-4 shadow-red hover:shadow-glow transition-all duration-300 hover:scale-[1.02] inline-flex items-center gap-2">
             Start deploying free
@@ -288,11 +310,10 @@
       </div>
     </div>
 
-    <!-- Decorative bottom fade -->
     <div class="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
   </section>
 
-  <!-- ============ LANGUAGE LOGOS MARQUEE ============ -->
+  <!-- ============ STACK MARQUEE ============ -->
   <section id="stack" class="bg-brand-surface border-y border-brand-line py-16">
     <div class="max-w-7xl mx-auto px-6 mb-10 text-center">
       <div class="reveal text-xs uppercase tracking-[0.2em] text-brand-muted font-semibold mb-3">Runs every stack</div>
@@ -302,12 +323,10 @@
     </div>
 
     <div class="marquee-wrap relative overflow-hidden">
-      <!-- Fade edges -->
       <div class="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-brand-surface to-transparent z-10 pointer-events-none"></div>
       <div class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-brand-surface to-transparent z-10 pointer-events-none"></div>
 
       <div class="marquee-track gap-12 items-center">
-        <!-- Track 1 -->
         <img src="https://cdn.simpleicons.org/python/3776AB" alt="Python" class="logo-tile h-12 w-12 shrink-0">
         <img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" alt="Node.js" class="logo-tile h-12 w-12 shrink-0">
         <img src="https://cdn.simpleicons.org/docker/2496ED" alt="Docker" class="logo-tile h-12 w-12 shrink-0">
@@ -321,8 +340,6 @@
         <img src="https://cdn.simpleicons.org/express/000000" alt="Express" class="logo-tile h-12 w-12 shrink-0">
         <img src="https://cdn.simpleicons.org/ubuntu/E95420" alt="Ubuntu" class="logo-tile h-12 w-12 shrink-0">
         <img src="https://cdn.simpleicons.org/github/181717" alt="GitHub" class="logo-tile h-12 w-12 shrink-0">
-
-        <!-- Track 2 (duplicate for infinite loop) -->
         <img src="https://cdn.simpleicons.org/python/3776AB" alt="" class="logo-tile h-12 w-12 shrink-0">
         <img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" alt="" class="logo-tile h-12 w-12 shrink-0">
         <img src="https://cdn.simpleicons.org/docker/2496ED" alt="" class="logo-tile h-12 w-12 shrink-0">
@@ -340,72 +357,103 @@
     </div>
   </section>
 
-  <!-- ============ FEATURES ============ -->
-  <section id="features" class="max-w-7xl mx-auto px-6 py-24 md:py-32">
-    <div class="max-w-2xl mb-16">
-      <div class="reveal text-xs uppercase tracking-[0.2em] text-brand-red font-semibold mb-3">Features</div>
+  <!-- ============ HOW IT WORKS ============ -->
+  <section id="how" class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <div class="reveal text-xs uppercase tracking-[0.2em] text-brand-red font-semibold mb-3">How it works</div>
       <h2 class="reveal reveal-d1 text-4xl md:text-5xl font-light tracking-tight">
-        Intuitive infrastructure,<br>
-        <span class="font-semibold">designed for builders</span>.
+        Three steps to <span class="font-semibold">production</span>.
       </h2>
       <p class="reveal reveal-d2 text-brand-muted mt-4 text-lg">
-        Ship software faster with integrated primitives that just work.
+        No servers to provision. No configs to maintain. No DevOps required.
       </p>
     </div>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <!-- Feature 1 -->
-      <div class="reveal lift bg-white border border-brand-line p-7 rounded-2xl">
-        <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
-          <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        </div>
-        <h3 class="font-semibold text-lg mb-2">Push-to-deploy</h3>
-        <p class="text-sm text-brand-muted leading-relaxed">Connect GitHub once. Every push triggers a fresh build and zero-downtime container swap.</p>
+    <div class="grid md:grid-cols-3 gap-6 relative">
+      <div class="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-brand-line to-transparent"></div>
+
+      <div class="reveal relative bg-white border border-brand-line rounded-2xl p-8 lift">
+        <div class="w-12 h-12 bg-brand-red text-white flex items-center justify-center text-lg font-bold shadow-redSm mb-6">1</div>
+        <h3 class="font-semibold text-lg mb-2">Connect your repo</h3>
+        <p class="text-sm text-brand-muted leading-relaxed">Point us at any GitHub repository and branch. We auto-detect Python, Node, or Docker.</p>
       </div>
 
-      <!-- Feature 2 -->
-      <div class="reveal reveal-d1 lift bg-white border border-brand-line p-7 rounded-2xl">
-        <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
-          <img src="https://cdn.simpleicons.org/postgresql/ED3138" alt="PostgreSQL" class="w-6 h-6">
-        </div>
-        <h3 class="font-semibold text-lg mb-2">Managed PostgreSQL</h3>
-        <p class="text-sm text-brand-muted leading-relaxed">One-click Postgres provisioning. Connection strings auto-injected into your apps.</p>
+      <div class="reveal reveal-d1 relative bg-white border border-brand-line rounded-2xl p-8 lift">
+        <div class="w-12 h-12 bg-brand-red text-white flex items-center justify-center text-lg font-bold shadow-redSm mb-6">2</div>
+        <h3 class="font-semibold text-lg mb-2">Add your domain</h3>
+        <p class="text-sm text-brand-muted leading-relaxed">Type a subdomain you own. We issue a valid SSL certificate and wire routing automatically.</p>
       </div>
 
-      <!-- Feature 3 -->
-      <div class="reveal reveal-d2 lift bg-white border border-brand-line p-7 rounded-2xl">
-        <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
-          <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.6 4A9 9 0 1112 3a9 9 0 018.6 9z"/></svg>
-        </div>
-        <h3 class="font-semibold text-lg mb-2">Automatic SSL</h3>
-        <p class="text-sm text-brand-muted leading-relaxed">Free Let's Encrypt certificates for every domain. Renewed forever, zero action required.</p>
+      <div class="reveal reveal-d2 relative bg-white border border-brand-line rounded-2xl p-8 lift">
+        <div class="w-12 h-12 bg-brand-red text-white flex items-center justify-center text-lg font-bold shadow-redSm mb-6">3</div>
+        <h3 class="font-semibold text-lg mb-2">Push to ship</h3>
+        <p class="text-sm text-brand-muted leading-relaxed">Every <code class="text-xs font-mono bg-brand-surface px-1.5 py-0.5">git push</code> triggers a fresh build and zero-downtime swap. Live in seconds.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section id="features" class="bg-brand-surface border-y border-brand-line">
+    <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+      <div class="max-w-2xl mb-16">
+        <div class="reveal text-xs uppercase tracking-[0.2em] text-brand-red font-semibold mb-3">Features</div>
+        <h2 class="reveal reveal-d1 text-4xl md:text-5xl font-light tracking-tight">
+          Intuitive infrastructure,<br>
+          <span class="font-semibold">designed for builders</span>.
+        </h2>
+        <p class="reveal reveal-d2 text-brand-muted mt-4 text-lg">
+          Ship software faster with integrated primitives that just work.
+        </p>
       </div>
 
-      <!-- Feature 4 -->
-      <div class="reveal lift bg-white border border-brand-line p-7 rounded-2xl">
-        <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
-          <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="reveal lift bg-white border border-brand-line p-7 rounded-2xl">
+          <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">Push-to-deploy</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Connect GitHub once. Every push triggers a fresh build and zero-downtime container swap.</p>
         </div>
-        <h3 class="font-semibold text-lg mb-2">Live logs</h3>
-        <p class="text-sm text-brand-muted leading-relaxed">Stream build and runtime logs in real time. Full history retained per deployment.</p>
-      </div>
 
-      <!-- Feature 5 -->
-      <div class="reveal reveal-d1 lift bg-white border border-brand-line p-7 rounded-2xl">
-        <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
-          <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        <div class="reveal reveal-d1 lift bg-white border border-brand-line p-7 rounded-2xl">
+          <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
+            <img src="https://cdn.simpleicons.org/postgresql/ED3138" alt="" class="w-6 h-6">
+          </div>
+          <h3 class="font-semibold text-lg mb-2">Managed PostgreSQL</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">One-click Postgres provisioning. Connection strings auto-injected into your apps.</p>
         </div>
-        <h3 class="font-semibold text-lg mb-2">Environment variables</h3>
-        <p class="text-sm text-brand-muted leading-relaxed">Masked secrets, reveal-on-demand. Injected at container start on every deploy.</p>
-      </div>
 
-      <!-- Feature 6 -->
-      <div class="reveal reveal-d2 lift bg-white border border-brand-line p-7 rounded-2xl">
-        <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
-          <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+        <div class="reveal reveal-d2 lift bg-white border border-brand-line p-7 rounded-2xl">
+          <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.6 4A9 9 0 1112 3a9 9 0 018.6 9z"/></svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">Automatic SSL</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Free Let's Encrypt certificates for every domain. Renewed forever, zero action required.</p>
         </div>
-        <h3 class="font-semibold text-lg mb-2">Your infrastructure</h3>
-        <p class="text-sm text-brand-muted leading-relaxed">Runs on your own VPS. Your data, your rules. Move or export anything at any time.</p>
+
+        <div class="reveal lift bg-white border border-brand-line p-7 rounded-2xl">
+          <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">Live logs</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Stream build and runtime logs in real time. Full history retained per deployment.</p>
+        </div>
+
+        <div class="reveal reveal-d1 lift bg-white border border-brand-line p-7 rounded-2xl">
+          <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">Environment variables</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Masked secrets, reveal-on-demand. Injected at container start on every deploy.</p>
+        </div>
+
+        <div class="reveal reveal-d2 lift bg-white border border-brand-line p-7 rounded-2xl">
+          <div class="w-12 h-12 bg-brand-redSoft flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">Your infrastructure</h3>
+          <p class="text-sm text-brand-muted leading-relaxed">Runs on your own VPS. Your data, your rules. Move or export anything at any time.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -434,7 +482,7 @@
     </div>
   </section>
 
-  <!-- ============ STATS COUNTERS ============ -->
+  <!-- ============ STATS ============ -->
   <section class="max-w-7xl mx-auto px-6 py-20 md:py-24">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
       <div class="reveal text-center">
@@ -456,58 +504,223 @@
     </div>
   </section>
 
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="bg-brand-surface border-y border-brand-line py-24">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <div class="reveal text-xs uppercase tracking-[0.2em] text-brand-red font-semibold mb-3">Loved by builders</div>
+        <h2 class="reveal reveal-d1 text-4xl md:text-5xl font-light tracking-tight">
+          Ship faster. <span class="font-semibold">Sleep better.</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="reveal bg-white border border-brand-line rounded-2xl p-8 lift">
+          <div class="flex gap-1 mb-5 text-brand-red">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+          </div>
+          <p class="text-brand-text leading-relaxed mb-6">"Deployed our Flask API in 40 seconds flat. We went from Heroku chaos to a single VPS we actually understand. Game-changer."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-brand-red text-white flex items-center justify-center font-semibold">AM</div>
+            <div>
+              <div class="font-medium text-sm text-brand-text">Alex M.</div>
+              <div class="text-xs text-brand-muted">Founder · Nairobi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-d1 bg-white border border-brand-line rounded-2xl p-8 lift">
+          <div class="flex gap-1 mb-5 text-brand-red">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+          </div>
+          <p class="text-brand-text leading-relaxed mb-6">"The logs are incredible. I can see exactly what's happening on every deploy without SSH-ing in. This is what PaaS should feel like."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-brand-text text-white flex items-center justify-center font-semibold">SK</div>
+            <div>
+              <div class="font-medium text-sm text-brand-text">Sarah K.</div>
+              <div class="text-xs text-brand-muted">CTO · Mombasa</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-d2 bg-white border border-brand-line rounded-2xl p-8 lift">
+          <div class="flex gap-1 mb-5 text-brand-red">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.098 10.1c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.673z"/></svg>
+          </div>
+          <p class="text-brand-text leading-relaxed mb-6">"Finally, a PaaS that doesn't cost more than our AWS bill. Self-hosted, fast, and it just works. Support answers within hours, not days."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-brand-red flex items-center justify-center text-white font-semibold">JO</div>
+            <div>
+              <div class="font-medium text-sm text-brand-text">James O.</div>
+              <div class="text-xs text-brand-muted">DevOps Lead · Kampala</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ PRICING ============ -->
-  <section id="pricing" class="bg-brand-surface border-y border-brand-line py-24">
+  <section id="pricing" class="bg-white py-24">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center max-w-2xl mx-auto mb-16">
         <div class="reveal text-xs uppercase tracking-[0.2em] text-brand-red font-semibold mb-3">Pricing</div>
-        <h2 class="reveal reveal-d1 text-4xl md:text-5xl font-light tracking-tight">Pay for what you use.</h2>
-        <p class="reveal reveal-d2 text-brand-muted mt-4 text-lg">Start free. Scale when you need to.</p>
+        <h2 class="reveal reveal-d1 text-4xl md:text-5xl font-light tracking-tight">Simple plans. Scale as you grow.</h2>
+        <p class="reveal reveal-d2 text-brand-muted mt-4 text-lg">Start free. Upgrade when you need more compute, databases, or team seats.</p>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
-        <!-- Hobby -->
-        <div class="reveal lift bg-white border border-brand-line p-8 rounded-2xl">
-          <div class="text-sm font-semibold text-brand-muted mb-1">Hobby</div>
-          <div class="text-4xl font-light mb-6">$0<span class="text-base text-brand-muted">/mo</span></div>
-          <p class="text-sm text-brand-muted mb-6">For personal projects and prototypes.</p>
-          <ul class="space-y-3 text-sm mb-8">
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Unlimited projects</li>
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Auto-deploy from GitHub</li>
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Free SSL certificates</li>
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Apps sleep after 5 min</li>
+      <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Free -->
+        <div class="reveal lift bg-white border border-brand-line p-6 rounded-2xl flex flex-col">
+          <div class="text-sm font-semibold text-brand-muted mb-1">Free</div>
+          <div class="text-4xl font-light mb-4">$0<span class="text-base text-brand-muted">/mo</span></div>
+          <p class="text-xs text-brand-muted mb-6 leading-relaxed min-h-[40px]">For personal projects and prototypes.</p>
+          <ul class="space-y-2 text-xs mb-6 flex-1">
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 1 project</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 512 MB RAM</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Auto-deploy</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Free SSL</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Community support</li>
           </ul>
-          <a href="{{ url_for('auth.register') }}" class="block text-center border border-brand-line py-3 text-sm font-medium hover:border-brand-text hover:bg-brand-surface transition">Start free</a>
+          <a href="{{ url_for('auth.register') }}" class="block text-center border border-brand-line py-2.5 text-sm font-medium hover:border-brand-text hover:bg-brand-surface transition">Start free</a>
         </div>
 
-        <!-- Pro (highlighted) -->
-        <div class="reveal reveal-d1 lift bg-brand-text text-white p-8 rounded-2xl relative gradient-glow md:-mt-4">
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-red text-white text-xs font-medium px-3 py-1">Most popular</div>
-          <div class="text-sm font-semibold text-brand-red mb-1">Pro</div>
-          <div class="text-4xl font-light mb-6">$50<span class="text-base text-white/60">/mo</span></div>
-          <p class="text-sm text-white/70 mb-6">For production apps and small teams.</p>
-          <ul class="space-y-3 text-sm mb-8">
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Everything in Hobby</li>
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 3 managed PostgreSQL databases</li>
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Environment variables</li>
+        <!-- Starter -->
+        <div class="reveal lift bg-white border border-brand-line p-6 rounded-2xl flex flex-col">
+          <div class="text-sm font-semibold text-brand-muted mb-1">Starter</div>
+          <div class="text-4xl font-light mb-4">$9<span class="text-base text-brand-muted">/mo</span></div>
+          <p class="text-xs text-brand-muted mb-6 leading-relaxed min-h-[40px]">For side projects going live.</p>
+          <ul class="space-y-2 text-xs mb-6 flex-1">
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 5 projects</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 1 GB RAM</li>
             <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Custom domains</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Env variables</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Email support</li>
           </ul>
-          <a href="{{ url_for('auth.register') }}" class="btn-shimmer block text-center text-white py-3 text-sm font-medium hover:scale-[1.02] transition-transform">Upgrade to Pro</a>
+          <a href="{{ url_for('auth.register') }}" class="block text-center border border-brand-line py-2.5 text-sm font-medium hover:border-brand-text hover:bg-brand-surface transition">Choose Starter</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="reveal reveal-d1 lift bg-brand-text text-white p-6 rounded-2xl relative gradient-glow md:-mt-4 flex flex-col">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-red text-white text-[10px] font-semibold uppercase tracking-wider px-3 py-1 whitespace-nowrap">Most popular</div>
+          <div class="text-sm font-semibold text-brand-red mb-1">Pro</div>
+          <div class="text-4xl font-light mb-4">$29<span class="text-base text-white/60">/mo</span></div>
+          <p class="text-xs text-white/70 mb-6 leading-relaxed min-h-[40px]">For production apps that matter.</p>
+          <ul class="space-y-2 text-xs mb-6 flex-1">
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 20 projects</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 2 GB RAM</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Managed PostgreSQL</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Cron jobs</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Priority support</li>
+          </ul>
+          <a href="{{ url_for('auth.register') }}" class="btn-shimmer block text-center text-white py-2.5 text-sm font-medium hover:scale-[1.02] transition-transform">Choose Pro</a>
+        </div>
+
+        <!-- Business -->
+        <div class="reveal lift bg-white border border-brand-line p-6 rounded-2xl flex flex-col">
+          <div class="text-sm font-semibold text-brand-muted mb-1">Business</div>
+          <div class="text-4xl font-light mb-4">$99<span class="text-base text-brand-muted">/mo</span></div>
+          <p class="text-xs text-brand-muted mb-6 leading-relaxed min-h-[40px]">For teams shipping at scale.</p>
+          <ul class="space-y-2 text-xs mb-6 flex-1">
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Unlimited projects</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 4 GB RAM</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 5 team seats</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Managed DB (50 GB)</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 99.9% SLA</li>
+          </ul>
+          <a href="mailto:sales@fabsdatawarehouse.com" class="block text-center border border-brand-line py-2.5 text-sm font-medium hover:border-brand-text hover:bg-brand-surface transition">Contact sales</a>
         </div>
 
         <!-- Enterprise -->
-        <div class="reveal reveal-d2 lift bg-white border border-brand-line p-8 rounded-2xl">
+        <div class="reveal reveal-d1 lift bg-white border border-brand-line p-6 rounded-2xl flex flex-col">
           <div class="text-sm font-semibold text-brand-muted mb-1">Enterprise</div>
-          <div class="text-4xl font-light mb-6">Custom</div>
-          <p class="text-sm text-brand-muted mb-6">Dedicated infrastructure and SLA.</p>
-          <ul class="space-y-3 text-sm mb-8">
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Everything in Pro</li>
+          <div class="text-3xl font-light mb-4">Custom</div>
+          <p class="text-xs text-brand-muted mb-6 leading-relaxed min-h-[40px]">Dedicated infra and compliance.</p>
+          <ul class="space-y-2 text-xs mb-6 flex-1">
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Everything in Business</li>
             <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Dedicated VPS</li>
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 99.9% uptime SLA</li>
-            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Priority support</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> SSO / SAML</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> 99.99% SLA</li>
+            <li class="flex items-start gap-2"><span class="text-brand-red font-bold">→</span> Dedicated success</li>
           </ul>
-          <a href="mailto:sales@fabsdatawarehouse.com" class="block text-center border border-brand-line py-3 text-sm font-medium hover:border-brand-text hover:bg-brand-surface transition">Contact sales</a>
+          <a href="mailto:sales@fabsdatawarehouse.com" class="block text-center border border-brand-line py-2.5 text-sm font-medium hover:border-brand-text hover:bg-brand-surface transition">Talk to us</a>
         </div>
+      </div>
+
+      <p class="text-center text-xs text-brand-muted mt-10">All prices in USD. Plans include free SSL, auto-deploys, and 24/7 monitoring.</p>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section id="faq" class="bg-brand-surface border-y border-brand-line py-24">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <div class="reveal text-xs uppercase tracking-[0.2em] text-brand-red font-semibold mb-3">FAQ</div>
+        <h2 class="reveal reveal-d1 text-4xl md:text-5xl font-light tracking-tight">
+          Questions, <span class="font-semibold">answered</span>.
+        </h2>
+      </div>
+
+      <div class="space-y-3">
+        <details class="faq reveal bg-white border border-brand-line rounded-xl p-5">
+          <summary class="flex items-center justify-between gap-4">
+            <span class="font-medium text-brand-text">Do I need a credit card to start?</span>
+            <svg class="faq-icon w-5 h-5 text-brand-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          </summary>
+          <p class="text-sm text-brand-muted mt-3 leading-relaxed">No. The Free tier is permanent. Upgrade to Starter, Pro, or Business only when you need more resources or team seats.</p>
+        </details>
+
+        <details class="faq reveal bg-white border border-brand-line rounded-xl p-5">
+          <summary class="flex items-center justify-between gap-4">
+            <span class="font-medium text-brand-text">Which languages and frameworks are supported?</span>
+            <svg class="faq-icon w-5 h-5 text-brand-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          </summary>
+          <p class="text-sm text-brand-muted mt-3 leading-relaxed">Anything that can run in Docker. Auto-detection covers Flask, Django, FastAPI, Node.js, Next.js, Express, and more. For anything else, add a Dockerfile to your repo root and we'll use it directly.</p>
+        </details>
+
+        <details class="faq reveal bg-white border border-brand-line rounded-xl p-5">
+          <summary class="flex items-center justify-between gap-4">
+            <span class="font-medium text-brand-text">How does auto-deploy work?</span>
+            <svg class="faq-icon w-5 h-5 text-brand-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          </summary>
+          <p class="text-sm text-brand-muted mt-3 leading-relaxed">We install a GitHub webhook on your repo. Every push to your configured branch triggers a fresh build and zero-downtime container swap. You can also click Deploy manually from the dashboard at any time.</p>
+        </details>
+
+        <details class="faq reveal bg-white border border-brand-line rounded-xl p-5">
+          <summary class="flex items-center justify-between gap-4">
+            <span class="font-medium text-brand-text">Can I bring my own domain?</span>
+            <svg class="faq-icon w-5 h-5 text-brand-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          </summary>
+          <p class="text-sm text-brand-muted mt-3 leading-relaxed">Yes. Any subdomain works out of the box. Point your DNS at our server, add the domain in the dashboard, and we'll issue a valid Let's Encrypt SSL certificate within seconds.</p>
+        </details>
+
+        <details class="faq reveal bg-white border border-brand-line rounded-xl p-5">
+          <summary class="flex items-center justify-between gap-4">
+            <span class="font-medium text-brand-text">What happens if I stop paying?</span>
+            <svg class="faq-icon w-5 h-5 text-brand-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          </summary>
+          <p class="text-sm text-brand-muted mt-3 leading-relaxed">Your projects drop to the Free tier limits. Nothing is deleted immediately — you get a grace period to re-subscribe. Data is preserved for 30 days after cancellation.</p>
+        </details>
+
+        <details class="faq reveal bg-white border border-brand-line rounded-xl p-5">
+          <summary class="flex items-center justify-between gap-4">
+            <span class="font-medium text-brand-text">Can I export my data?</span>
+            <svg class="faq-icon w-5 h-5 text-brand-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          </summary>
+          <p class="text-sm text-brand-muted mt-3 leading-relaxed">Always. Database dumps, environment variables, and container images can be exported at any time. There's no lock-in — your code lives in your GitHub, not ours.</p>
+        </details>
       </div>
     </div>
   </section>
@@ -600,7 +813,6 @@
 
   <!-- ============ SCRIPTS ============ -->
   <script>
-    // ─── Typewriter headline ───
     (function() {
       const words = ['production', 'your users', 'the world'];
       const el = document.getElementById('typewriter');
@@ -614,12 +826,10 @@
         el.textContent = word.substring(0, charIndex);
 
         if (!isDeleting && charIndex === word.length) {
-          // Hold full word for 2s, then start deleting
           setTimeout(() => { isDeleting = true; type(); }, 2000);
           return;
         }
         if (isDeleting && charIndex === 0) {
-          // Move to next word
           isDeleting = false;
           wordIndex = (wordIndex + 1) % words.length;
           setTimeout(type, 400);
@@ -631,11 +841,9 @@
         setTimeout(type, delay);
       }
 
-      // Start after 1.5s
       setTimeout(type, 1500);
     })();
 
-    // ─── Scroll reveal via IntersectionObserver ───
     (function() {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -649,7 +857,6 @@
       document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     })();
 
-    // ─── Stats counters ───
     (function() {
       const counters = document.querySelectorAll('.counter');
       if (!counters.length) return;
@@ -666,7 +873,6 @@
           function tick(now) {
             const elapsed = now - start;
             const progress = Math.min(elapsed / duration, 1);
-            // Ease-out cubic
             const eased = 1 - Math.pow(1 - progress, 3);
             const current = Math.round(target * eased);
             el.textContent = current + suffix;
@@ -680,7 +886,6 @@
       counters.forEach(el => observer.observe(el));
     })();
 
-    // ─── Terminal typing animation ───
     (function() {
       const output = document.getElementById('terminal-output');
       if (!output) return;
@@ -716,7 +921,6 @@
           charIndex++;
           setTimeout(typeNext, line.text.startsWith('$') ? 50 : 15);
         } else {
-          // Line done — add newline, move to next
           output.appendChild(document.createTextNode('\n'));
           currentLineEl = null;
           charIndex = 0;
@@ -727,7 +931,6 @@
         }
       }
 
-      // Start when terminal is in view
       const terminalObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -739,7 +942,6 @@
       terminalObserver.observe(output);
     })();
 
-    // ─── Sticky header shadow ───
     (function() {
       const header = document.getElementById('site-header');
       if (!header) return;
