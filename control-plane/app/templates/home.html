@@ -21,6 +21,7 @@
               dark: '#09090b', surface: '#121214', line: '#27272a',
               text: '#fafafa', muted: '#a1a1aa',
               red: '#ED3138', redGlow: 'rgba(237,49,56,0.15)',
+              purple: '#8A05FF', purpleGlow: 'rgba(138,5,255,0.15)'
             }
           },
           fontFamily: {
@@ -29,12 +30,10 @@
           },
           animation: {
             'float': 'float 6s ease-in-out infinite',
-            'float-delayed': 'float 6s ease-in-out 3s infinite',
             'grid-move': 'gridMove 20s linear infinite',
             'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
-            'marquee': 'marquee 30s linear infinite',
-            'typing': 'typing 3.5s steps(40, end)',
-            'blink': 'blink 1s step-end infinite',
+            'scroll-left': 'scrollLeft 40s linear infinite',
+            'scroll-right': 'scrollRight 40s linear infinite',
           },
           keyframes: {
             float: {
@@ -49,17 +48,13 @@
               '0%, 100%': { opacity: 0.4, transform: 'scale(1)' },
               '50%': { opacity: 0.8, transform: 'scale(1.05)' },
             },
-            marquee: {
+            scrollLeft: {
               '0%': { transform: 'translateX(0)' },
-              '100%': { transform: 'translateX(-50%)' },
+              '100%': { transform: 'translateX(calc(-50% - 1rem))' },
             },
-            typing: {
-              'from': { width: '0' },
-              'to': { width: '100%' }
-            },
-            blink: {
-              '0%, 100%': { opacity: 1 },
-              '50%': { opacity: 0 }
+            scrollRight: {
+              '0%': { transform: 'translateX(calc(-50% - 1rem))' },
+              '100%': { transform: 'translateX(0)' },
             }
           }
         }
@@ -71,8 +66,8 @@
     /* CSS Grid Background */
     .bg-grid {
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
       background-size: 40px 40px;
     }
     
@@ -88,15 +83,6 @@
     ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
 
-    /* Typewriter Container */
-    .typewriter-container {
-      display: inline-block;
-      overflow: hidden;
-      white-space: nowrap;
-      border-right: 3px solid #ED3138;
-      animation: typing 2s steps(20, end), blink .75s step-end infinite;
-    }
-
     /* Reveal on scroll */
     .reveal {
       opacity: 0;
@@ -108,16 +94,15 @@
       transform: translateY(0);
     }
 
-    /* Bento Box Glow Effect */
-    .bento-card {
-      position: relative;
-      background: #121214;
-      border: 1px solid #27272a;
-      transition: all 0.3s ease;
-    }
-    .bento-card:hover {
-      border-color: rgba(237, 49, 56, 0.4);
-      box-shadow: 0 0 30px rgba(237, 49, 56, 0.1);
+    /* Moving Code Background */
+    #code-bg {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      opacity: 0.15;
+      z-index: 0;
+      mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
     }
   </style>
 </head>
@@ -158,132 +143,203 @@
 
   <!-- HERO SECTION -->
   <section class="relative pt-24 pb-32 overflow-hidden">
+    <!-- Canvas for moving code background -->
+    <canvas id="code-bg"></canvas>
+    
     <!-- Background Grid & Glows -->
-    <div class="absolute inset-0 bg-grid mask-radial animate-grid-move pointer-events-none"></div>
-    <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-red/10 rounded-full blur-[120px] animate-pulse-glow pointer-events-none"></div>
-    <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px] animate-pulse-glow pointer-events-none" style="animation-delay: 2s;"></div>
+    <div class="absolute inset-0 bg-grid mask-radial animate-grid-move pointer-events-none z-0"></div>
+    <div class="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-brand-purple/10 rounded-full blur-[120px] animate-pulse-glow pointer-events-none z-0"></div>
+    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-brand-red/10 rounded-full blur-[100px] animate-pulse-glow pointer-events-none z-0" style="animation-delay: 2s;"></div>
 
-    <div class="relative max-w-7xl mx-auto px-6">
+    <div class="relative max-w-7xl mx-auto px-6 z-10">
       <div class="text-center max-w-4xl mx-auto mb-16">
-        <div class="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-line bg-brand-surface/50 text-xs font-medium text-brand-muted mb-8 backdrop-blur-sm">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          All systems operational. Built for African builders.
-        </div>
-        
-        <h1 class="reveal text-5xl md:text-7xl lg:text-[5.5rem] font-semibold tracking-[-0.04em] leading-[1.05]">
+        <h1 class="reveal text-5xl md:text-7xl lg:text-[6rem] font-medium tracking-[-0.04em] leading-[1.05]">
           Your fastest path <br>
-          to <span class="typewriter-container text-brand-red">production.</span>
+          to production <br>
+          <span class="text-brand-muted">for any workload</span>
         </h1>
         
         <p class="reveal mt-8 text-lg md:text-xl text-brand-muted max-w-2xl mx-auto leading-relaxed">
-          Intuitive infrastructure to scale any app from your first user to your billionth. Push code, we handle the rest.
+          Intuitive infrastructure to scale any app or agent from your first user to your billionth.
         </p>
 
         <div class="reveal mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="{{ url_for('auth.register') }}" class="w-full sm:w-auto px-8 py-3.5 bg-brand-red text-white text-sm font-semibold rounded-md hover:bg-red-600 transition-colors shadow-[0_0_20px_rgba(237,49,56,0.4)]">
-            Start for free &rarr;
+          <a href="{{ url_for('auth.register') }}" class="w-full sm:w-auto px-6 py-3 bg-white text-black text-sm font-semibold rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+            Start for free <span class="text-lg leading-none">&rarr;</span>
           </a>
-          <a href="mailto:sales@fabsdatawarehouse.com" class="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-brand-line text-white text-sm font-semibold rounded-md hover:border-white transition-colors">
+          <a href="mailto:sales@fabsdatawarehouse.com" class="w-full sm:w-auto px-6 py-3 bg-transparent border border-brand-line text-white text-sm font-semibold rounded-md hover:border-white transition-colors">
             Talk to sales
           </a>
         </div>
       </div>
 
-      <!-- Animated Hero Graphic -->
-      <div class="reveal relative max-w-5xl mx-auto mt-16 perspective-1000">
-        <!-- Main Container -->
-        <div class="relative bg-brand-surface rounded-xl border border-brand-line shadow-2xl overflow-hidden group">
-          <!-- Top Bar -->
-          <div class="flex items-center justify-between px-4 py-3 border-b border-brand-line bg-[#18181b]">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-              <span class="text-xs text-brand-muted font-medium">Acme</span>
-              <span class="text-brand-line">&rsaquo;</span>
-              <span class="text-xs text-white font-medium flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-brand-red"></span> Production
-              </span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-1 bg-brand-line/50 text-brand-muted text-[10px] font-mono rounded">us-east-1</span>
-            </div>
+      <!-- 🔥 NEW HERO NODE GRAPH VISUAL 🔥 -->
+      <div class="reveal relative max-w-6xl mx-auto mt-16 rounded-xl border border-[#27272a] overflow-hidden bg-[#0c0c0e] shadow-2xl">
+        
+        <!-- Top Bar -->
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-[#27272a] bg-[#121214]">
+          <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          <span class="text-sm font-medium text-white">Acme</span>
+          <span class="text-brand-line">&rsaquo;</span>
+          <div class="flex items-center gap-2 border border-brand-line rounded-full px-3 py-1 bg-[#09090b]">
+            <span class="w-2 h-2 rounded-full border-2 border-brand-purple"></span>
+            <span class="text-xs text-white font-medium">Production</span>
           </div>
+        </div>
 
-          <!-- Canvas Area -->
-          <div class="relative p-8 h-[400px] bg-[#0c0c0e] overflow-hidden flex items-center justify-between gap-4">
-            <!-- Background subtle gradient -->
-            <div class="absolute inset-0 bg-gradient-to-tr from-brand-red/5 via-transparent to-blue-500/5 pointer-events-none"></div>
+        <!-- Canvas Area -->
+        <div class="relative p-8 md:p-12 overflow-hidden flex flex-col md:flex-row gap-6 justify-between items-center min-h-[450px]">
+          
+          <!-- Glowing Background Gradient -->
+          <div class="absolute inset-0 bg-gradient-to-t from-brand-purple/20 via-brand-purple/5 to-transparent pointer-events-none z-0"></div>
 
-            <!-- Left Column (Services) -->
-            <div class="flex flex-col gap-4 relative z-10 w-48">
-              <!-- Node 1 -->
-              <div class="bg-[#121214] border border-brand-line rounded-lg p-3 animate-float hover:border-brand-red transition-colors cursor-default shadow-lg">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-xs font-semibold text-white">Storefront</span>
-                  <span class="text-[9px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded flex items-center gap-1"><span class="w-1 h-1 bg-emerald-400 rounded-full"></span>Live</span>
-                </div>
-                <span class="text-[10px] text-brand-muted">Static site</span>
-              </div>
-              <!-- Node 2 -->
-              <div class="bg-[#121214] border border-brand-line rounded-lg p-3 animate-float-delayed hover:border-brand-red transition-colors cursor-default shadow-lg">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-xs font-semibold text-white">Orders</span>
-                  <span class="text-[9px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded flex items-center gap-1"><span class="w-1 h-1 bg-emerald-400 rounded-full"></span>Live</span>
-                </div>
-                <span class="text-[10px] text-brand-muted">Workflows</span>
-              </div>
-            </div>
-
-            <!-- Middle Column (Connections + DBs) -->
-            <div class="flex flex-col gap-4 relative z-10 w-48">
-               <!-- SVG Lines connecting -->
-               <div class="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-line to-transparent -z-10"></div>
-               
-               <!-- Node 3 -->
-              <div class="bg-[#121214] border border-brand-line rounded-lg p-3 animate-float hover:border-brand-red transition-colors cursor-default shadow-lg" style="animation-delay: 1s;">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-xs font-semibold text-white flex items-center gap-1">
-                    <svg class="w-3 h-3 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
-                    Database
-                  </span>
-                  <span class="text-[9px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded flex items-center gap-1"><span class="w-1 h-1 bg-emerald-400 rounded-full"></span>Live</span>
-                </div>
-                <span class="text-[10px] text-brand-muted">Postgres</span>
-              </div>
-               <!-- Node 4 -->
-               <div class="bg-[#121214] border border-brand-line rounded-lg p-3 animate-float-delayed hover:border-brand-red transition-colors cursor-default shadow-lg" style="animation-delay: 2.5s;">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-xs font-semibold text-white">Records</span>
-                  <span class="text-[9px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded flex items-center gap-1"><span class="w-1 h-1 bg-emerald-400 rounded-full"></span>Live</span>
-                </div>
-                <span class="text-[10px] text-brand-muted">Private service</span>
-              </div>
-            </div>
-
-            <!-- Right Column (Terminal) -->
-            <div class="flex flex-col gap-4 relative z-10 w-64 md:w-80">
-              <div class="bg-[#0c0c0e] border border-brand-line rounded-lg overflow-hidden shadow-2xl group-hover:border-brand-red/50 transition-colors">
-                <div class="px-3 py-2 border-b border-brand-line flex items-center justify-between bg-[#121214]">
-                  <span class="text-[10px] text-brand-muted font-mono">API · deploy 3f9a2c1</span>
-                  <span class="text-[9px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded flex items-center gap-1"><span class="w-1 h-1 bg-emerald-400 rounded-full"></span>Live</span>
-                </div>
-                <div class="p-3 text-[11px] font-mono leading-relaxed text-brand-muted">
-                  <div class="text-blue-400">==> Uploading build...</div>
-                  <div class="text-emerald-400">==> Build successful</div>
-                  <div class="text-blue-400">==> Deploying...</div>
-                  <div class="text-white mt-2 font-semibold flex items-center gap-1">==> Your service is live 🎉</div>
-                  <div class="mt-3 w-full bg-brand-line h-1 rounded-full overflow-hidden">
-                    <div class="bg-brand-red h-full w-3/4 animate-[pulseGlow_2s_ease-in-out_infinite]"></div>
+          <!-- Left Columns (Grid of Nodes) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-6 relative z-10 w-full md:w-2/3">
+            
+            <!-- Column 1 -->
+            <div class="space-y-6">
+              <!-- Storefront -->
+              <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">Storefront</div>
+                    <div class="text-xs text-brand-muted">Static site</div>
                   </div>
                 </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+              <!-- Orders -->
+              <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg relative">
+                <span class="absolute -top-2 left-4 text-[9px] font-bold bg-brand-purple text-white px-1.5 py-0.5 rounded">New</span>
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">Orders</div>
+                    <div class="text-xs text-brand-muted">Workflows</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+              <!-- ETL -->
+              <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">ETL</div>
+                    <div class="text-xs text-brand-muted">Cron job</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Succeeded</span>
+              </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div class="space-y-6 mt-0 sm:mt-12">
+               <!-- API -->
+               <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">API</div>
+                    <div class="text-xs text-brand-muted">Web service</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+              <!-- Database -->
+              <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">Database</div>
+                    <div class="text-xs text-brand-muted">Postgres</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+              <!-- Records -->
+              <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">Records</div>
+                    <div class="text-xs text-brand-muted">Private service</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+            </div>
+
+            <!-- Column 3 -->
+            <div class="space-y-6 mt-0 sm:mt-24">
+              <!-- Agents -->
+              <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">Agents</div>
+                    <div class="text-xs text-brand-muted">Background worker</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+              <!-- Code runner -->
+              <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg relative">
+                <span class="absolute -top-2 left-4 text-[9px] font-bold bg-brand-purple text-white px-1.5 py-0.5 rounded">New</span>
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">Code runner</div>
+                    <div class="text-xs text-brand-muted">Sandboxes</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+              <!-- Cache -->
+              <div class="bg-[#121214]/90 backdrop-blur-sm border border-[#27272a] rounded-lg p-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                  <div>
+                    <div class="text-sm font-semibold text-white">Cache</div>
+                    <div class="text-xs text-brand-muted">Key Value</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- Right Column (Terminal Log) -->
+          <div class="relative z-10 w-full md:w-[320px]">
+            <div class="bg-[#09090b]/90 backdrop-blur-sm border border-[#27272a] rounded-xl overflow-hidden shadow-2xl">
+              <div class="px-4 py-3 border-b border-[#27272a] flex items-center justify-between bg-[#121214]/50">
+                <span class="text-xs text-brand-muted font-mono">API · deploy 3f9a2c1</span>
+                <span class="text-[10px] font-medium text-emerald-400 flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Live</span>
+              </div>
+              <div class="p-5 font-mono text-[12px] leading-relaxed text-brand-muted space-y-1.5">
+                <div>==> Uploading build...</div>
+                <div>==> Build successful</div>
+                <div>==> Deploying...</div>
+                <div class="text-emerald-400 font-semibold pt-1">==> Your service is live 🎉</div>
+                
+                <!-- Playback controls (decorative) -->
+                <div class="flex items-center gap-3 pt-4 mt-4 border-t border-[#27272a] opacity-50">
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <div class="flex-1 h-1 bg-[#27272a] rounded-full"><div class="w-1/3 h-full bg-white rounded-full"></div></div>
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </section>
 
-  <!-- LOGO CLOUD / SOCIAL PROOF -->
+  <!-- SOCIAL PROOF -->
   <section class="border-y border-brand-line bg-brand-surface/50 py-10">
     <div class="max-w-7xl mx-auto px-6">
       <p class="text-center text-xs font-semibold text-brand-muted tracking-widest uppercase mb-8">Trusted by builders across Africa</p>
@@ -298,8 +354,123 @@
     </div>
   </section>
 
+  <!-- TECH STACK MARQUEE -->
+  <section class="py-24 relative overflow-hidden bg-[#09090b]">
+    <div class="max-w-7xl mx-auto px-6 mb-12 reveal">
+      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-4">Whatever your stack,<br> it runs on FABS.</h2>
+      <a href="{{ url_for('auth.register') }}" class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white text-black text-sm font-semibold rounded-md hover:bg-gray-200 transition shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+        View templates &rarr;
+      </a>
+    </div>
+
+    <!-- Dual Marquee Container -->
+    <div class="marquee-container relative flex flex-col gap-4 overflow-hidden py-4">
+      
+      <!-- Row 1 (Scrolling Left) -->
+      <div class="flex gap-4 w-max animate-scroll-left">
+        <!-- Group 1 -->
+        <div class="flex gap-4">
+          <!-- Python -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/python/3776AB" alt="Python" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Node -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" alt="Node.js" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Docker -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/docker/2496ED" alt="Docker" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- PostgreSQL -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Redis -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/redis/DC382D" alt="Redis" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Flask -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/flask/ffffff" alt="Flask" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- FastAPI -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/fastapi/009688" alt="FastAPI" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Django -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/django/ffffff" alt="Django" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+        </div>
+        <!-- Group 2 (Duplicate for seamless scroll) -->
+        <div class="flex gap-4">
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/python/3776AB" alt="Python" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" alt="Node" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/docker/2496ED" alt="Docker" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/redis/DC382D" alt="Redis" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/flask/ffffff" alt="Flask" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/fastapi/009688" alt="FastAPI" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/django/ffffff" alt="Django" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+        </div>
+      </div>
+
+      <!-- Row 2 (Scrolling Right) -->
+      <div class="flex gap-4 w-max animate-scroll-right">
+        <!-- Group 1 -->
+        <div class="flex gap-4">
+          <!-- Next.js -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/nextdotjs/ffffff" alt="Next.js" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Express -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/express/ffffff" alt="Express" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- PHP -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/php/777BB4" alt="PHP" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Go -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/go/00ADD8" alt="Go" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Rust -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/rust/ffffff" alt="Rust" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Ruby -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/ruby/CC342D" alt="Ruby" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Java -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/openjdk/ffffff" alt="Java" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+          <!-- Swift -->
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group">
+            <img src="https://cdn.simpleicons.org/swift/F05138" alt="Swift" class="w-12 h-12 opacity-70 group-hover:opacity-100 transition-opacity">
+          </div>
+        </div>
+        <!-- Group 2 (Duplicate) -->
+        <div class="flex gap-4">
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/nextdotjs/ffffff" alt="Next.js" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/express/ffffff" alt="Express" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/php/777BB4" alt="PHP" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/go/00ADD8" alt="Go" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/rust/ffffff" alt="Rust" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/ruby/CC342D" alt="Ruby" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/openjdk/ffffff" alt="Java" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+          <div class="w-24 h-24 bg-brand-surface border border-brand-line rounded-xl flex items-center justify-center hover:border-brand-red transition-colors group"><img src="https://cdn.simpleicons.org/swift/F05138" alt="Swift" class="w-12 h-12 opacity-70 group-hover:opacity-100"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- CLICK CLICK DONE (Process) -->
-  <section id="how" class="py-24 relative overflow-hidden">
+  <section id="how" class="py-24 relative overflow-hidden bg-brand-surface/30 border-y border-brand-line">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16 reveal">
         <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-4">Click, click, done.</h2>
@@ -313,7 +484,7 @@
           <h3 class="text-2xl font-semibold text-white mb-3">Create a service</h3>
           <p class="text-brand-muted text-sm leading-relaxed mb-6">Choose what you need to run your apps, APIs, agent logic, databases, cron jobs, and more.</p>
           
-          <div class="bg-brand-surface border border-brand-line rounded-lg p-2">
+          <div class="bg-brand-surface border border-brand-line rounded-lg p-2 transition-transform group-hover:-translate-y-1">
             <div class="flex items-center gap-2 px-3 py-2 text-sm text-white bg-[#1c1c1f] rounded border border-brand-line/50 mb-1">
               <svg class="w-4 h-4 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
               Web service
@@ -330,9 +501,9 @@
         <div class="reveal group" style="transition-delay: 100ms;">
           <div class="w-10 h-10 bg-[#8A05FF] text-white flex items-center justify-center rounded-md font-bold text-lg mb-6 shadow-[0_0_15px_rgba(138,5,255,0.5)]">2</div>
           <h3 class="text-2xl font-semibold text-white mb-3">Push your code</h3>
-          <p class="text-brand-muted text-sm leading-relaxed mb-6">Just connect your repo. Render detects your framework and deploys it on the right runtime.</p>
+          <p class="text-brand-muted text-sm leading-relaxed mb-6">Just connect your repo. FABS detects your framework and deploys it on the right runtime.</p>
           
-          <div class="bg-[#0c0c0e] border border-brand-line rounded-lg p-4 font-mono text-[11px] text-brand-muted">
+          <div class="bg-[#0c0c0e] border border-brand-line rounded-lg p-4 font-mono text-[11px] text-brand-muted transition-transform group-hover:-translate-y-1">
             <div class="mb-2"><span class="text-blue-400">~</span> $ git commit -am "Final tweaks"</div>
             <div class="mb-2 text-white">[main 4f2c9ab] Final tweaks</div>
             <div><span class="text-blue-400">~</span> $ git push</div>
@@ -342,10 +513,10 @@
         <!-- Step 3 -->
         <div class="reveal group" style="transition-delay: 200ms;">
           <div class="w-10 h-10 bg-[#8A05FF] text-white flex items-center justify-center rounded-md font-bold text-lg mb-6 shadow-[0_0_15px_rgba(138,5,255,0.5)]">3</div>
-          <h3 class="text-2xl font-semibold text-white mb-3">Render does the rest</h3>
+          <h3 class="text-2xl font-semibold text-white mb-3">FABS does the rest</h3>
           <p class="text-brand-muted text-sm leading-relaxed mb-6">Get instant networking, scaling, previews, deploys, rollbacks, and monitoring.</p>
           
-          <div class="bg-brand-surface border border-brand-line rounded-lg p-3 space-y-3">
+          <div class="bg-brand-surface border border-brand-line rounded-lg p-3 space-y-3 transition-transform group-hover:-translate-y-1">
             <div class="flex items-start gap-2">
               <svg class="w-4 h-4 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
               <div>
@@ -367,7 +538,7 @@
   </section>
 
   <!-- BENTO BOX FEATURES -->
-  <section id="features" class="py-24 bg-brand-surface/30 border-y border-brand-line">
+  <section id="features" class="py-24">
     <div class="max-w-7xl mx-auto px-6">
       <div class="mb-16 reveal">
         <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-4">Everything you need to ship.</h2>
@@ -375,7 +546,7 @@
       </div>
 
       <div class="grid md:grid-cols-2 gap-6">
-        <!-- Feature 1: Massive -->
+        <!-- Feature 1 -->
         <div class="reveal bento-card rounded-2xl p-8 md:col-span-2 relative overflow-hidden group">
           <div class="absolute inset-0 bg-gradient-to-r from-brand-red/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           <div class="relative z-10 grid md:grid-cols-2 gap-8 items-center">
@@ -495,7 +666,7 @@
 
         <!-- Pro (Glowing) -->
         <div class="reveal bg-[#18181b] border-2 border-brand-red rounded-2xl p-6 flex flex-col relative shadow-[0_0_30px_rgba(237,49,56,0.15)] transform md:-translate-y-2">
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-red text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">Most Popular</div>
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-red text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-[0_0_10px_rgba(237,49,56,0.5)]">Most Popular</div>
           <div class="text-sm font-semibold text-white mb-2">Pro</div>
           <div class="text-4xl font-semibold text-white mb-6">$29<span class="text-base font-normal text-brand-muted">/mo</span></div>
           <p class="text-xs text-brand-muted mb-6 leading-relaxed min-h-[40px]">For production apps that matter.</p>
@@ -600,41 +771,117 @@
   <!-- FOOTER -->
   <footer class="border-t border-brand-line bg-[#09090b]">
     <div class="max-w-7xl mx-auto px-6 py-16">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-10 mb-12">
-        <div class="col-span-2">
-          <a href="{{ url_for('main.home') }}" class="flex items-center gap-2.5 mb-6">
-            <div class="w-6 h-6 bg-brand-red flex items-center justify-center text-white text-[10px] font-black rounded">F</div>
-            <span class="font-semibold text-white">FABS Deploy</span>
-          </a>
-          <p class="text-sm text-brand-muted max-w-xs leading-relaxed">Intuitive infrastructure to scale any workload. Built for builders across Africa.</p>
-        </div>
+      <!-- Massive Footer Grid matching screenshot -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-10 mb-12">
+        <!-- Services -->
         <div>
-          <h4 class="text-xs uppercase tracking-wider text-white font-semibold mb-4">Product</h4>
+          <h4 class="text-sm font-semibold text-white mb-4">Services</h4>
           <ul class="space-y-2.5 text-sm">
-            <li><a href="#features" class="text-brand-muted hover:text-white transition">Features</a></li>
-            <li><a href="#pricing" class="text-brand-muted hover:text-white transition">Pricing</a></li>
-            <li><a href="#how" class="text-brand-muted hover:text-white transition">How it works</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">FABS Sandboxes</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">FABS Workflows</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Web Services</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Private Services</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Background Workers</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Cron Jobs</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Static Sites</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">FABS Postgres</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">FABS Key Value</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Persistent Disks</a></li>
           </ul>
         </div>
+        
+        <!-- Features -->
         <div>
-          <h4 class="text-xs uppercase tracking-wider text-white font-semibold mb-4">Developers</h4>
+          <h4 class="text-sm font-semibold text-white mb-4">Features</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Preview Environments</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Infrastructure As Code</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Zero Downtime Deploys</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">FABS CLI</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">FABS MCP</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Docker support</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">REST API</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Autoscaling</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Private Networking</a></li>
+          </ul>
+        </div>
+
+        <!-- Developers -->
+        <div>
+          <h4 class="text-sm font-semibold text-white mb-4">Developers</h4>
           <ul class="space-y-2.5 text-sm">
             <li><a href="{{ url_for('public.docs') }}" class="text-brand-muted hover:text-white transition">Docs</a></li>
-            <li><a href="#" class="text-brand-muted hover:text-white transition">API Reference</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Agents</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Framework Quickstarts</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Templates</a></li>
             <li><a href="#" class="text-brand-muted hover:text-white transition">Changelog</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Blog</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Articles</a></li>
           </ul>
         </div>
+
+        <!-- Resources -->
         <div>
-          <h4 class="text-xs uppercase tracking-wider text-white font-semibold mb-4">Company</h4>
+          <h4 class="text-sm font-semibold text-white mb-4">Resources</h4>
           <ul class="space-y-2.5 text-sm">
+            <li><a href="#pricing" class="text-brand-muted hover:text-white transition">Pricing</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Customers</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">FABS for Startups</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">HIPAA on FABS</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Migration Credits</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Heroku Migration Guide</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Railway Migration Guide</a></li>
+          </ul>
+        </div>
+
+        <!-- Company & Compare -->
+        <div>
+          <h4 class="text-sm font-semibold text-white mb-4">Company</h4>
+          <ul class="space-y-2.5 text-sm mb-8">
             <li><a href="#" class="text-brand-muted hover:text-white transition">About</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Careers</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Newsroom</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Brand Kit</a></li>
             <li><a href="mailto:sales@fabsdatawarehouse.com" class="text-brand-muted hover:text-white transition">Contact</a></li>
-            <li><a href="#" class="text-brand-muted hover:text-white transition">Privacy</a></li>
+          </ul>
+          
+          <h4 class="text-sm font-semibold text-white mb-4">Compare</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Vercel</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Heroku</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Railway</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Fly.io</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal & Socials -->
+        <div>
+          <h4 class="text-sm font-semibold text-white mb-4">Legal</h4>
+          <ul class="space-y-2.5 text-sm mb-8">
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Privacy Policy</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Security</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Shared Responsibility Model</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Terms of Use</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">DMCA Policy</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">DPA</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">Acceptable Use</a></li>
+          </ul>
+
+          <h4 class="text-sm font-semibold text-white mb-4">Socials</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="text-brand-muted hover:text-white transition">X</a></li>
+            <li><a href="#" class="text-brand-muted hover:text-white transition">LinkedIn</a></li>
+            <li><a href="https://github.com/1234manucho/fabs-platform" class="text-brand-muted hover:text-white transition">GitHub</a></li>
           </ul>
         </div>
       </div>
+
+      <!-- Bottom Bar -->
       <div class="pt-8 border-t border-brand-line flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-brand-muted">
-        <span>&copy; 2026 FABS Trading. All rights reserved.</span>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-brand-red flex items-center justify-center text-white text-[10px] font-black rounded">F</div>
+          <span>&copy; 2026 FABS Trading. All rights reserved.</span>
+        </div>
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span class="text-xs">All systems operational</span>
@@ -645,7 +892,7 @@
 
   <!-- JAVASCRIPT ANIMATIONS -->
   <script>
-    // Scroll Reveal
+    // 1. Scroll Reveal
     const revealElements = document.querySelectorAll('.reveal');
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -658,7 +905,7 @@
     
     revealElements.forEach(el => revealObserver.observe(el));
 
-    // Number Counter Animation
+    // 2. Number Counter Animation
     const counters = document.querySelectorAll('.counter');
     const counterObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -672,8 +919,7 @@
         function update(now) {
           const elapsed = now - start;
           const progress = Math.min(elapsed / duration, 1);
-          // Ease out cubic
-          const eased = 1 - Math.pow(1 - progress, 3);
+          const eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
           el.textContent = Math.round(target * eased) + suffix;
           if (progress < 1) requestAnimationFrame(update);
         }
@@ -683,6 +929,62 @@
     }, { threshold: 0.5 });
 
     counters.forEach(el => counterObserver.observe(el));
+
+    // 3. Moving Code Background
+    const canvas = document.getElementById('code-bg');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const codeSnippets = [
+      "git push origin main",
+      "npm run build",
+      "docker build -t app .",
+      "pip install -r requirements.txt",
+      "flask run --host=0.0.0.0",
+      "SELECT * FROM users;",
+      "const app = express();",
+      "export default function App()",
+      "kubectl apply -f deployment.yaml",
+      "ssh root@192.168.1.1",
+      "sudo apt-get update",
+      "ping 8.8.8.8"
+    ];
+
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    for (let x = 0; x < columns; x++) {
+      drops[x] = Math.random() * -100;
+    }
+
+    function draw() {
+      ctx.fillStyle = "rgba(9, 9, 11, 0.1)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = "#a1a1aa"; // brand-muted
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+        // Draw text at random opacity for a nice glow effect
+        ctx.fillText(text, i * fontSize * 3, drops[i] * fontSize);
+        
+        // Randomly reset drop to top
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    
+    // Run the background animation
+    setInterval(draw, 50);
   </script>
 
 </body>
